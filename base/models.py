@@ -2,22 +2,25 @@ from django.db import models
 from django.utils.html import mark_safe
 from .limit import SingletonModel
 
-class user_amount(models.Model):
-    max_users = models.IntegerField(verbose_name="Users_in_same_time",default=1)
-
-class time_amount(models.Model):
-    period = models.IntegerField(verbose_name="period_based_on_month",default=1)
-
 class the_product(models.Model):
+    period_choices = (
+        ('1',"one_months"),
+        ('3',"three_months"),
+        ('6',"six_months"),
+    )
+    users = (
+        ('1','one'),
+        ('2','two'),
+        ('3','three'),
+        ('4','four'),
+        ('5','five'),
+    )
     product = models.CharField(max_length=50, verbose_name="product")
+    price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")
-    users_amount = models.ManyToManyField(user_amount)
-    time_limit = models.ManyToManyField(time_amount)
-    base_price = models.DecimalField(max_digits=10, decimal_places=2,default=50)
-    users_amount_prices = models.JSONField(default=dict) 
-    time_limit_prices = models.JSONField(default=dict) 
-
+    period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
+    max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
     def __str__(self):
         return self.product
     

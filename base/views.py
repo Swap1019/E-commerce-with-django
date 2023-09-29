@@ -4,6 +4,8 @@ from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView,DetailView
 from .models import the_product,page_pic
+from django.http import JsonResponse
+import json
 
 class home(ListView):
     template_name = "base/home.html"
