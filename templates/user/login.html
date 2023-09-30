@@ -4,7 +4,7 @@
 {% block main %}
 	<!-- main -->
 	<div class="main-w3layouts wrapper">
-		<h1>Creative SignUp Form</h1>
+		<h1>Login</h1>
 		<div class="main-agileinfo">
             {% if form.non_field_errors %}
 			    <div class="errors">
@@ -20,9 +20,9 @@
 					<div class="wthree-text">
 						<div class="clear"> </div>
 					</div>
-					<input type="submit" value="SIGNUP">
+					<input type="submit" value="LOGIN">
 				</form>
-				<p>have an Account? <a href="{% url 'login' %}"> Login Now!</a></p>
+				<p>Don't have an Account? <a href="{% url 'register' %}"> SignUp Now!</a></p>
 			</div>
 		</div>
 	<!-- //main --> 
