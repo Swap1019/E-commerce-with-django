@@ -1,14 +1,14 @@
 #E-commerce
 This website is for training purpose
-
-Currently Created:
-Home page 
-Detail page-related product section
-User register-login-logout
-
-Need to create:
-New arrivals-soldout --- in process
-add to Cart
-user management page
-payment page
-comments section
+<br/>
+Currently Created: <br/>
+Home page <br/>
+Detail page-related product section <br/>
+User register-login-logout <br/>
+<br/>
+Need to create: <br/>
+New arrivals-soldout : <strong> in process </strong> <br/>
+add to Cart <br/>
+user management page <br/>
+payment page <br/>
+comments section <br/>
