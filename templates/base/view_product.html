@@ -5,7 +5,7 @@
         <section class="py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{product.pic_sample.url}}" alt="..." /></div>
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{product.pic_sample.url}}" /></div>
                     <div class="col-md-6">
                         <h1 class="display-5 fw-bolder">{{product.product}}</h1>
                         <div class="fs-5 mb-5">
@@ -33,32 +33,38 @@
             </div>
         </section>
         <!-- Related items section-->
+        {% if related_products %}
         <section class="py-5 bg-light">
             <div class="container px-4 px-lg-5 mt-5">
                 <h2 class="fw-bolder mb-4">Related products</h2>
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                    <div class="col mb-5">
+                
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" style="transition: 0ms;">
+                    {% for related_product in related_products %}
+                    <div class="col mb-5"> 
                         <div class="card h-100">
                             <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+                            <img class="card-img-top" src="{{related_product.pic_sample.url}}" />
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">
                                     <!-- Product name-->
-                                    <h5 class="fw-bolder">Fancy Product</h5>
+                                    <h5 class="fw-bolder">{{ related_product.product }}</h5>
                                     <!-- Product price-->
-                                    $40.00 - $80.00
+                                    {{ related_product.price }}
                                 </div>
                             </div>
-                            <!-- Product actions-->
+                            <!-- Product actions-->  
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View options</a></div>
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'base:product' related_product.id %}">View</a></div>
                             </div>
                         </div>
-                    </div>
+                    </div>  
+                    {% endfor %}
                 </div>
+                
             </div>
         </section>
+        {% endif %}
         <!-- Footer-->
         <footer class="py-5 bg-dark">
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>

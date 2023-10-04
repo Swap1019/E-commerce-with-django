@@ -2,6 +2,13 @@ from django.db import models
 from django.utils.html import mark_safe
 from .limit import SingletonModel
 
+class product_category(models.Model):
+    parent = models.ForeignKey('self', default=None, null=True, blank=True, on_delete=models.SET_NULL, related_name='children',verbose_name="parent")
+    title = models.CharField(max_length=200,verbose_name='Category-title')
+    slug = models.SlugField(max_length=100,unique=True,verbose_name='Category-Addres')
+    status = models.BooleanField(default=True, verbose_name='Make it publish')
+    position = models.IntegerField(verbose_name='position')
+
 class the_product(models.Model):
     period_choices = (
         ('1',"one_months"),
@@ -15,6 +22,7 @@ class the_product(models.Model):
         ('4','four'),
         ('5','five'),
     )
+    category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
     product = models.CharField(max_length=50, verbose_name="product")
     price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
