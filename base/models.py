@@ -2,14 +2,15 @@ from django.db import models
 from django.utils.html import mark_safe
 from .limit import SingletonModel
 from datetime import datetime,timedelta
-from django.db.models import Q
 
 class TheProductManager(models.Manager):
+    def Availables(self):
+        self.filter(availability="a")
+
     def NewArrivals(self):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
-        return super().get_queryset().filter(availabled_at__range=[last_week,Today])
-    
+        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
     
 
 
@@ -33,6 +34,11 @@ class TheProduct(models.Model):
         ('4','four'),
         ('5','five'),
     )
+    status = (
+        ('a','available'),
+        ('u','unavailable'),
+        ('c','checking_product'),
+    )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
     product = models.CharField(max_length=50, verbose_name="product")
     price = models.IntegerField(verbose_name="price",default=50)
@@ -40,7 +46,8 @@ class TheProduct(models.Model):
     description = models.TextField(verbose_name="description")
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
     max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
-    availabled_at = models.DateTimeField(auto_now_add=True,verbose_name="availabled_at")
+    imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
+    availability = models.CharField(max_length=1,choices=status,verbose_name="availability_status",default='u')
     def __str__(self):
         return self.product
     

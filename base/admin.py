@@ -4,7 +4,7 @@ from django.utils.html import mark_safe
 # Register your models here.
 
 class TheProduct_admin(admin.ModelAdmin):
-    list_display = ('product','pic_sample_preview','price','availabled_at')
+    list_display = ('product','pic_sample_preview','price','imported_at','availability')
     search_fields = (['product'])
 
 class page_pic_admin(admin.ModelAdmin):
