@@ -3,11 +3,14 @@ from django.utils.html import mark_safe
 from .limit import SingletonModel
 from datetime import datetime,timedelta
 
-class TheProductManager(models.Manager):
-    def Availables(self):
-        self.filter(availability="a")
+class IPAddress(models.Model):
+    ip_address = models.GenericIPAddressField(verbose_name="ip_address")
 
-    def NewArrivals(self):
+class TheProductManager(models.Manager):
+    def availables(self):
+        return super().get_queryset().filter(availability="a")
+
+    def newarrivals(self):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
         return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
@@ -22,6 +25,7 @@ class product_category(models.Model):
     position = models.IntegerField(verbose_name='position')
 
 class TheProduct(models.Model):
+    product = models.CharField(max_length=50, verbose_name="product")
     period_choices = (
         ('1',"one_months"),
         ('3',"three_months"),
@@ -40,14 +44,14 @@ class TheProduct(models.Model):
         ('c','checking_product'),
     )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
-    product = models.CharField(max_length=50, verbose_name="product")
     price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
     max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
     imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
-    availability = models.CharField(max_length=1,choices=status,verbose_name="availability_status",default='u')
+    availability = models.CharField(max_length=1,choices=status,default='u')
+    hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
     def __str__(self):
         return self.product
     
@@ -63,4 +67,9 @@ class page_pic(SingletonModel):
     class Meta:
         verbose_name = 'website_pic'
         verbose_name_plural = 'website_pic'
+
+class ProductHit(models.Model):
+    product = models.ForeignKey(TheProduct, on_delete=models.CASCADE)
+    ip_address = models.ForeignKey(IPAddress, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
     
