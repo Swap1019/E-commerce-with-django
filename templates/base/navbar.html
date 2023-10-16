@@ -1,20 +1,4 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Shop Item - Start Bootstrap Template</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
-        <!-- Bootstrap icons-->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
-    </head>
-    <body>
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
@@ -29,7 +13,7 @@
                                 <li><a class="dropdown-item" href="{% url 'base:home' %}">All Products</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" href="{% url 'base:mostviewed' %}">Most Viewed</a></li>
-                                <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                                <li><a class="dropdown-item" href="{% url 'base:mostrated' %}">Popular Items</a></li>
                                 <li><a class="dropdown-item" href="{% url 'base:newarrivals' %}">New Arrivals</a></li>
                             </ul>
                         </li>
@@ -60,7 +44,3 @@
                 </div>
             </div>
         </nav>
-        {% block content %}
-        {% endblock %}
-    </body>
-</html>

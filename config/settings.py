@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'user.apps.UserConfig',
+    'star_ratings',
 ]
 
 MIDDLEWARE = [
@@ -133,4 +134,5 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user.User"
-CRISPY_TEMPLATE_PACK = 'bootstrap5' 
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+STAR_RATINGS_RERATE_SAME_DELETE = True

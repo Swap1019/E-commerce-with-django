@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views
-from .views import home,product,NewArrivalsView,MostViewedProducts
+from .views import home,product,NewArrivalsView,MostViewedProducts,MostRatedProducts
 
 app_name = "base"
 
@@ -9,4 +9,5 @@ urlpatterns = [
     path('product/<int:id>',product.as_view(),name="product"),
     path('newarrivals/',NewArrivalsView.as_view(),name="newarrivals"),
     path('mostviewed/',MostViewedProducts.as_view(),name="mostviewed"),
+    path('mostrated/',MostRatedProducts.as_view(),name="mostrated"),
 ]

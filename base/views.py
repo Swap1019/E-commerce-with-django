@@ -68,3 +68,18 @@ class MostViewedProducts(ListView):
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
         return context
+    
+class MostRatedProducts(ListView):
+    template_name = "base/list_page.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        #gets the most rated products
+        most_rated_products = TheProduct.objects.filter(ratings__isnull=False).order_by('-ratings__average')
+        return most_rated_products
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add the background_pic to the context
+        context['background_pic'] = page_pic.objects.get().website_pic
+        return context

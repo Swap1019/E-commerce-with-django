@@ -1,13 +1,33 @@
-{% extends 'base/navbar.html' %}
+{% extends "star_ratings/widget_base.html" %}
 {% load static %}
-{% block content %}
+{% load ratings %}
+{% block rating_detail %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Shop Item - Start Bootstrap Template</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navbar -->
+        {% include 'base/navbar.html' %}
         <!-- Product section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{product.pic_sample.url}}" /></div>
                     <div class="col-md-6">
-                        views: {{object.hits.count}}
+                        <img class="card-img-top mb-5 mb-md-0" src="{{product.pic_sample.url}}" />  
+                        {% ratings object %}
+                    </div>
+                    <div class="col-md-6">
                         <h1 class="display-5 fw-bolder">{{product.product}}</h1>
                         <div class="fs-5 mb-5">
                             <!--<span class="text-decoration-line-through">$45.00</span>   class for off price -->
@@ -38,7 +58,6 @@
         <section class="py-5 bg-light">
             <div class="container px-4 px-lg-5 mt-5">
                 <h2 class="fw-bolder mb-4">Related products</h2>
-                
                 <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" style="transition: 0ms;">
                     {% for related_product in related_products %}
                     <div class="col mb-5"> 
@@ -61,8 +80,7 @@
                         </div>
                     </div>  
                     {% endfor %}
-                </div>
-                
+                </div> 
             </div>
         </section>
         {% endif %}
@@ -75,4 +93,9 @@
         <!-- ajax call-->
         <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
         <script src="{% static '/base/js/detail_script.js' %}"></script>
+        <!-- django-star-ratings call-->
+        <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+        <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>        
+    </body>   
+</html>
 {% endblock %}
