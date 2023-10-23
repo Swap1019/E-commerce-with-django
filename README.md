@@ -1,6 +1,6 @@
 Project in progress</br>
 </br>
-As you know this is E-commerce website</br>
+As you know this is a E-commerce website with django</br>
 That contains objects like : </br>
 Users,Sellers,Products,Shops,Comments</br>
 </br>
