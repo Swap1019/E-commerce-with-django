@@ -4,18 +4,14 @@ from .limit import SingletonModel
 from datetime import datetime,timedelta
 from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
+import uuid
 
 class IPAddress(models.Model):
     ip_address = models.GenericIPAddressField(verbose_name="ip_address")
 
-class TheProductManager(models.Manager):
-    def availables(self):
-        return super().get_queryset().filter(availability="a")
-
-    def newarrivals(self):
-        Today = datetime.today()
-        last_week = Today-timedelta(days=7)
-        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
+class Shop(models.Model):
+    shop_name = models.CharField(max_length=50, verbose_name="shop")
+    Shop_id = models.UUIDField(primary_key = True,default = uuid.uuid4,editable = False) 
     
 
 
@@ -25,6 +21,15 @@ class product_category(models.Model):
     slug = models.SlugField(max_length=100,unique=True,verbose_name='Category-Addres')
     status = models.BooleanField(default=True, verbose_name='Make it publish')
     position = models.IntegerField(verbose_name='position')
+
+class TheProductManager(models.Manager):
+    def availables(self):
+        return super().get_queryset().filter(availability="a")
+
+    def newarrivals(self):
+        Today = datetime.today()
+        last_week = Today-timedelta(days=7)
+        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
 
 class TheProduct(models.Model):
     product = models.CharField(max_length=50, verbose_name="product")
@@ -46,6 +51,7 @@ class TheProduct(models.Model):
         ('c','checking_product'),
     )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
+    product_shop = models.ForeignKey(Shop,default=None,on_delete=models.CASCADE)
     price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")

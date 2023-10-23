@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TheProduct,page_pic,product_category
+from .models import TheProduct,page_pic,product_category,Shop
 from django.utils.html import mark_safe
 # Register your models here.
 
@@ -16,6 +16,11 @@ class product_category_admin(admin.ModelAdmin):
     search_fields = ('parent', 'title')
     ordering = ['-status']
 
+class Shop_admin(admin.ModelAdmin):
+    list_display = ('shop_name','Shop_id')
+    search_fields = (['shop_name'])
+
+admin.site.register(Shop,Shop_admin)
 admin.site.register(TheProduct,TheProduct_admin)
 admin.site.register(page_pic,page_pic_admin)
 admin.site.register(product_category,product_category_admin)
