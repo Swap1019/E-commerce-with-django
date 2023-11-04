@@ -1,6 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm 
-from .models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.core.validators import MaxValueValidator, MinValueValidator
+from .models import User,UserSellerInfo
 
 class SignupForm(UserCreationForm):
     #User signup form
@@ -39,3 +40,23 @@ class UserProFileForm(forms.ModelForm):
         model = User
         fields = ['username','email','first_name','last_name',
 	        'is_seller']
+
+class SellerRegisterForm(forms.ModelForm):
+    #User SellerRegisterForm
+    class Meta:
+        model = UserSellerInfo
+        fields = "__all__"
+        exclude = ['user_id']
+
+class SellerRequestApprove(forms.ModelForm):
+    def __init__(self,*args, **kwargs):
+        user = kwargs.pop('user')
+        
+        super(SellerRequestApprove, self).__init__(*args, **kwargs)  
+        self.fields['email'].disabled = True
+        self.fields['is_seller'].help_text = "Accept this user as a Seller?"
+    class Meta:
+        model = User
+        fields = ['email','is_seller']
+
+    
