@@ -1,0 +1,29 @@
+{% extends 'user/register_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block main %}
+	<!-- main -->
+	<div class="main-w3layouts wrapper">
+		<h1>Login</h1>
+		<div class="main-agileinfo">
+            {% if form.non_field_errors %}
+			    <div class="errors">
+				    {% for error in form.non_field_errors %}
+					    <span>{{error}}</span>
+				    {% endfor %}
+			    </div>
+		    {% endif %}
+			<div class="agileits-top">
+				<form class="form-group" method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+					<div class="wthree-text">
+						<div class="clear"> </div>
+					</div>
+					<input type="submit" value="LOGIN">
+				</form>
+				<p>Don't have an Account? <a href="{% url 'register' %}"> SignUp Now!</a></p>
+			</div>
+		</div>
+	<!-- //main --> 
+{% endblock %}

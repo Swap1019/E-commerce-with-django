@@ -1,0 +1,53 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!--Seller request details-->
+<section class="p-4 d-flex justify-content-center w-100">
+    <div class="card mb-3">
+        <img src="{{ SellerInfo.identity_certificate.url }}" height="600" width="800"  class="card-img-top" alt="Wild Landscape"/>
+        <div class="card-body">
+          <h5 class="card-title">{{SellerInfo.first_name}} {{SellerInfo.last_name}}</h5>
+          <p class="card-text">
+            {{ SellerInfo.national_code }}
+          </p>
+          <p class="card-text">
+            {{ SellerInfo.user_id }}
+          </p>
+          <p class="card-text">
+            Create a description for seller request model later
+          </p>
+          <p class="card-text">
+            <small class="text-muted">Last updated 3 mins ago</small>
+          </p>
+        </div>
+    </div>
+</section>
+<!--End of Seller request detail -->
+
+
+<!--User update form-->
+<div class="main-w3layouts wrapper">
+    <h1></h1>
+    <div class="main-agileinfo">
+        {% if form.non_field_errors %}
+            <div class="errors">
+                {% for error in form.non_field_errors %}
+                    <span>{{error}}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="agileits-top">
+            <form class="form-group" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="wthree-text">
+                    <div class="clear"> </div>
+                </div>
+                <input type="submit" value="Confirm">
+            </form>
+        </div>
+    </div>
+</div>
+<!--End of User update form-->
+{% endblock %}
