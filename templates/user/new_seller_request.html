@@ -13,7 +13,7 @@
               <img src="{{ Seller_information.identity_certificate.url }}" width = "100" height="200" style="border-radius: 5px"  class="card-img-top">
               <div class="card-body">
                 <h5 class="card-title">{{Seller_information.first_name}} {{Seller_information.last_name}}</h5>
-                <a href="{% url 'seller-request-detail' Seller_information.user_id %}">See User's request</a>
+                <a href="{% url 'user:seller-request-detail' Seller_information.user_id %}">See User's request</a>
               </div>
               <div class="card-footer">
                 <small class="text-muted">Last updated 3 mins ago</small>

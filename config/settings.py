@@ -55,6 +55,11 @@ MIDDLEWARE = [
     'base.middleware.SaveIPAddressMiddleware',
 ]
 
+SILENCED_SYSTEM_CHECKS = ['auth.E003', 'auth.W004']
+
+#custom authentication backend
+#AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

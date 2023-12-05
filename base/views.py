@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView,DetailView
 from .models import TheProduct,page_pic
+from user.models import User
 from datetime import datetime,timedelta
 
 class home(ListView):
@@ -14,6 +15,8 @@ class home(ListView):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
+        context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+        context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context
     
 class product(DetailView):
@@ -38,6 +41,7 @@ class product(DetailView):
         categories = product.category.all()  # Assuming a product can belong to multiple categories
         related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
         context['related_products'] = related_products
+        context['user_profile'] = User.objects.get().profile
 
         return context
     
@@ -50,6 +54,7 @@ class NewArrivalsView(ListView):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
+        context['user_profile'] = User.objects.get().profile
         return context
     
 class MostViewedProducts(ListView):
@@ -58,15 +63,13 @@ class MostViewedProducts(ListView):
 
     def get_queryset(self):
         #gets the most viewed products
-        most_viewed_products = TheProduct.objects.availables().annotate(
-            count=Count('hits')).order_by('-count')
-
-        return most_viewed_products
-
+        return TheProduct.objects.mostviewedproducts()
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
+        context['user_profile'] = User.objects.get().profile
         return context
     
 class MostRatedProducts(ListView):
@@ -74,12 +77,11 @@ class MostRatedProducts(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        #gets the most rated products
-        most_rated_products = TheProduct.objects.filter(ratings__isnull=False).order_by('-ratings__average')
-        return most_rated_products
-
+        return TheProduct.objects.mostratedproducts()
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
+        context['user_profile'] = User.objects.get().profile
         return context

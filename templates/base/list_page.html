@@ -15,8 +15,8 @@
         <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
     </head>
     <body>
-        <!--Navbar-->
-        {% include 'base/navbar.html' %}
+        <!--Navbar with passing the profile pic-->
+        {% include 'base/navbar.html' with user_profile=user_profile username=username %}
         <!--Website Recents-->
         {% include 'base/header.html' %}
         <!-- Section-->

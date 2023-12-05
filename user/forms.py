@@ -1,11 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.core.validators import MaxValueValidator, MinValueValidator
 from .models import User,UserSellerInfo
 
 class SignupForm(UserCreationForm):
     #User signup form
-    email = forms.EmailField(max_length=200,widget= forms.EmailInput
+    email = forms.EmailField(max_length=200,required=True,widget= forms.EmailInput
                            (attrs={'placeholder':'Email','style':'margin-bottom:7px;'}))
     username = forms.CharField(widget= forms.TextInput
                            (attrs={'placeholder':'Username','style':'margin-bottom:7px;'}))
@@ -16,7 +15,7 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username','first_name','last_name','email','password1','password2')
+        fields = ('profile','nickname','username','first_name','last_name','email')
     
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
@@ -38,7 +37,7 @@ class UserProFileForm(forms.ModelForm):
     class Meta:
         #specifing the model and fields
         model = User
-        fields = ['username','email','first_name','last_name',
+        fields = ['profile','nickname','username','email','first_name','last_name',
 	        'is_seller']
 
 class SellerRegisterForm(forms.ModelForm):
@@ -48,15 +47,20 @@ class SellerRegisterForm(forms.ModelForm):
         fields = "__all__"
         exclude = ['user_id']
 
+
 class SellerRequestApprove(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         user = kwargs.pop('user')
         
-        super(SellerRequestApprove, self).__init__(*args, **kwargs)  
+        super(SellerRequestApprove, self).__init__(*args, **kwargs) 
+        self.fields['first_name'].disabled = True
+        self.fields['last_name'].disabled = True 
         self.fields['email'].disabled = True
         self.fields['is_seller'].help_text = "Accept this user as a Seller?"
+        self.fields['is_staff'].disabled = True
+        self.fields['date_joined'].disabled = True
+        #admin_reject_reason is enabled
+        #review_status is enabled
     class Meta:
         model = User
-        fields = ['email','is_seller']
-
-    
+        fields = ['username','first_name','last_name','email','is_staff','is_seller','date_joined','admin_reject_reason']

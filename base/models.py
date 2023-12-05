@@ -2,16 +2,13 @@ from django.db import models
 from django.utils.html import mark_safe
 from .limit import SingletonModel
 from datetime import datetime,timedelta
+from user.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
-import uuid
+from django.db.models import Count
 
 class IPAddress(models.Model):
     ip_address = models.GenericIPAddressField(verbose_name="ip_address")
-
-class Shop(models.Model):
-    shop_name = models.CharField(max_length=50, verbose_name="shop")
-    Shop_id = models.UUIDField(primary_key = True,default = uuid.uuid4,editable = False) 
     
 
 
@@ -23,14 +20,24 @@ class product_category(models.Model):
     position = models.IntegerField(verbose_name='position')
 
 class TheProductManager(models.Manager):
-    def availables(self):
+    def availables(self,**kwargs):
         return super().get_queryset().filter(availability="a")
+    
+    def unavailables(self,**kwargs):
+        return super().get_queryset().filter(availability="u")
 
-    def newarrivals(self):
+    def newarrivals(self,**kwargs):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
         return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
+    
+    def mostratedproducts(self,**kwargs):
+        return super().get_queryset().filter(ratings__isnull=False).order_by('-ratings__average')
 
+    def mostviewedproducts(self,**kwargs):
+        return super().get_queryset().filter(availability="a").annotate(
+            count=Count('hits')).order_by('-count')
+        
 class TheProduct(models.Model):
     product = models.CharField(max_length=50, verbose_name="product")
     period_choices = (
@@ -51,7 +58,7 @@ class TheProduct(models.Model):
         ('c','checking_product'),
     )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
-    product_shop = models.ForeignKey(Shop,default=None,on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
     price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")

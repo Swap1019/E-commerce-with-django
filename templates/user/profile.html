@@ -32,9 +32,12 @@
                             <div class="col-6">
                                 {{ form.is_seller|as_crispy_field }}
                             </div>
-                                        
+                            <div class="col-6">
+                                {{ form.profile|as_crispy_field }}
+                            </div>         
                         </div>
-                        <button class="btn btn-success">Update</button>
+                        <input class="btn btn-success" type="submit" value="Update">
+                        
                     </form>
                 </div>
             </div>
