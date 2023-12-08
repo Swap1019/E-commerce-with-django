@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'crispy_forms',
     'crispy_bootstrap5',
-    'user.apps.UserConfig',
     'star_ratings',
+    'user.apps.UserConfig',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +58,6 @@ MIDDLEWARE = [
 SILENCED_SYSTEM_CHECKS = ['auth.E003', 'auth.W004']
 
 #custom authentication backend
-#AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
 ROOT_URLCONF = 'config.urls'
 
@@ -138,6 +137,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = "user.User"
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 STAR_RATINGS_RERATE_SAME_DELETE = True
+AUTH_USER_MODEL = "user.User"
+AUTH_PROFILE_MODULE = "user.User"

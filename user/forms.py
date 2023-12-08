@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from .models import User,UserSellerInfo
 
 class SignupForm(UserCreationForm):
@@ -22,23 +22,28 @@ class SignupForm(UserCreationForm):
         self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password','style':'margin-bottom:7px;'})
         self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password confirmation','style':'margin-bottom:7px;'})
     
-class UserProFileForm(forms.ModelForm):
+class UserProfileForm(UserChangeForm):
     #User profileform
     def __init__(self,*args, **kwargs):
         user = kwargs.pop('user')
+        super(UserProfileForm, self).__init__(*args, **kwargs)
 
-        super(UserProFileForm, self).__init__(*args, **kwargs)  
         if not user.is_superuser:
             self.fields['first_name'].disabled = True
             self.fields['last_name'].disabled = True
             #self.fields['email'].help_text = "Change it if it was neccessary"
             self.fields['email'].disabled = True
             self.fields['is_seller'].disabled = True
+        
     class Meta:
         #specifing the model and fields
         model = User
         fields = ['profile','nickname','username','email','first_name','last_name',
 	        'is_seller']
+        
+        widgets = {
+            'profile': forms.FileInput(attrs={'accept': 'image/*'}),  # Add accept attribute for image files
+        }
 
 class SellerRegisterForm(forms.ModelForm):
     #User SellerRegisterForm

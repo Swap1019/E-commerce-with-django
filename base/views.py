@@ -15,8 +15,9 @@ class home(ListView):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
-        context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-        context['username'] = User.objects.get(pk=self.request.user.pk).username
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context
     
 class product(DetailView):
@@ -41,7 +42,8 @@ class product(DetailView):
         categories = product.category.all()  # Assuming a product can belong to multiple categories
         related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
         context['related_products'] = related_products
-        context['user_profile'] = User.objects.get().profile
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get().profile
 
         return context
     

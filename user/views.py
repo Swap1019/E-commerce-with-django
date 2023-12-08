@@ -1,9 +1,10 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import (
     SignupForm,
-    UserProFileForm,
+    UserProfileForm,
     SellerRegisterForm,
     SellerRequestApprove,
     )
@@ -11,7 +12,7 @@ from .models import User,UserSellerInfo
 from base.models import TheProduct
 from django.urls import reverse_lazy,reverse
 from django.views.generic import CreateView,ListView,UpdateView,DetailView
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView,LogoutView
 
 #----------Form views-----------
 
@@ -30,6 +31,12 @@ class UserLogin(LoginView):
     template_name = 'user/login.html'
     fields = '__all__'
     redirect_authenticated_user = True
+    def get_success_url(self):
+        return reverse_lazy('base:home')
+    
+class UserLogout(LogoutView):
+    template_name = 'user/list_page.html'
+    
     def get_success_url(self):
         return reverse_lazy('base:home')
     
@@ -91,26 +98,19 @@ class SellerRequest(UpdateView):
 
 #---------User account interface -----------
 
-class AccountView(UpdateView):
+class AccountView(LoginRequiredMixin,UpdateView):
     model = User
-    form_class = UserProFileForm
+    form_class = UserProfileForm
     template_name = "user/profile.html"
     success_url = reverse_lazy("user:profile")
 
     def get_object(self):
-        return User.objects.get(pk= self.request.user.pk)
+        return User.objects.get(pk = self.request.user.pk)
     
     def get_form_kwargs(self):
-        kwargs = super(AccountView,self).get_form_kwargs()
-        kwargs.update({
-			'user': self.request.user
-		})
+        kwargs = super(AccountView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass 'user' directly to the form
         return kwargs
-    
-    def form_valid(self, form):
-        profile = form.save()
-        user = profile.user
-        user.save()
 
 class ShopTotalView(ListView):
     template_name = "user/shop.html"

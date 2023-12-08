@@ -1,22 +1,30 @@
 {% load static %}
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="user-profile-container" style="margin-left: 30px; border: 2px solid lightgrey; border-radius: 12px; padding:3px;">
-                {% if username %}
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ username }}</span>
-                {% endif %}
-                {% if user_profile %}
-                    <img src="{{ user_profile.url }}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
-                {% else %}
-                    <img src="{% static 'user/img/noun-user-avatar-2540366.svg' %}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
-                {% endif %}
-            </div>
+            <!--User profile info-->
+              <div class="dropdown profile-container">
+                <span class="dropdown-toggle mr-2 d-none d-lg-inline text-gray-600 small" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">{{ username }}
+                    {% if user_profile %}
+                        <img src="{{ user_profile.url }}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                    {% else %}
+                        <img src="{% static 'user/img/noun-user-avatar-2540366.svg' %}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                    {% endif %}
+                </span>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><a class="dropdown-item" href="{% url 'user:profile' %}">Profile</a></li>
+                  <li><a class="dropdown-item" href="{% url 'user:shop' %}">Your Shop</a></li>
+                </ul>
+              </div>
+
+            <!--End of User profile info-->
             <div class="container px-4 px-lg-5">
                 <a class="navbar-brand" href="{% url 'base:home' %}">Home</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <!--About Shop-->
                         <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                        <!--Shop specifying-->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -27,15 +35,18 @@
                                 <li><a class="dropdown-item" href="{% url 'base:newarrivals' %}">New Arrivals</a></li>
                             </ul>
                         </li>
+                        <!--End of Shop specifying-->
                     </ul>
+                    
                     {% if user.is_authenticated %}
+                    <!--User's cart-->
                     <div class="buttons">
                             <button class="btn btn-outline-dark" type="submit">
                                 <i class="bi-cart-fill me-1"></i>
                                 Cart
                                 <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
                             </button>
-                        
+                    <!--Logout button-->
                         <a href="{% url 'user:logout' %}" style="margin-left: 10px;">
                             <!--<img src="{% static '/base/assets/logout-svgrepo-com.svg' %}" style="height: 1%; width: 1%;"> -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="Black" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
@@ -44,7 +55,8 @@
                             </svg>
                         </a>
                     </div>
-                    {% else %}  
+                    {% else %}
+                    <!--Register button-->
                         <form class="d-flex ms-2">
                             <button class="btn btn-outline-dark link" type="submit">
                                 <a class="link" href="{% url 'user:register' %}">Sign up</a>
@@ -54,3 +66,8 @@
                 </div>
             </div>
         </nav>
+
+        <!--Custom css-->
+        <link rel="stylesheet" type="text/css" href="{% static 'base/css/navbar.css' %}" />
+
+        

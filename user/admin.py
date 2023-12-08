@@ -3,7 +3,7 @@ from .models import User,UserSellerInfo
 
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username','first_name','last_name','is_staff','is_active','is_seller','user_id')
+    list_display = ('username','profile','first_name','last_name','is_staff','is_active','is_seller','user_id')
 
 class UserSellerInfoAdmin(admin.ModelAdmin):
     list_display = ('first_name','last_name','national_code','identity_view','user_id')

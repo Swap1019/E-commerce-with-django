@@ -1,0 +1,9 @@
+.profile-container{
+    margin-left: 30px; 
+    border: 2px solid lightgrey; 
+    border-radius: 12px; 
+    padding:3px;
+}
+.profile-container:hover{
+    cursor: pointer;
+}

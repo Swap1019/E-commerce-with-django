@@ -1,10 +1,11 @@
 from django.urls import path
-from django.contrib.auth.views import LogoutView
+
 from django.conf.urls.static import static
 from django.conf import settings
 from .views import (
     Register,
     UserLogin,
+    UserLogout,
     AccountView,
     SellerRegisterFormView,
     NewSellerRequests,
@@ -22,7 +23,7 @@ urlpatterns = [
     #register and form urls
     path('register/',Register.as_view(),name='register'),
     path('login/',UserLogin.as_view(),name='login'),
-    path('logout/',LogoutView.as_view(),name='logout'),
+    path('logout/',UserLogout.as_view(),name='logout'),
     path('seller-register/',SellerRegisterFormView.as_view(),name='seller-register'),
     path('new-seller-requests/',NewSellerRequests.as_view(),name='new-seller-requests'),
     path('seller-request/<uuid:user_id>',SellerRequest.as_view(),name='seller-request-detail'),

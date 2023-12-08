@@ -15,7 +15,7 @@
                     <h3 class = "card-title mb-0 float-left">User Update</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <form method="post" action="{% url 'user:profile' %}" enctype="multipart/form-data">{% csrf_token %}
                         <div class="row">
                             <div class="col-6">
                                 {{ form.username|as_crispy_field }}
