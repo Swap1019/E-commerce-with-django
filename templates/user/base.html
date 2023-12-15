@@ -70,7 +70,9 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Status</h6>
                         <a class="collapse-item" href="{% url 'user:profile' %}">Profile</a>
-                        <a class="collapse-item" href="{% url 'user:new-seller-requests' %}">New seller requests</a>
+                        {% if user.is_superuser %}
+                            <a class="collapse-item" href="{% url 'user:new-seller-requests' %}">New seller requests</a>
+                        {% endif %}
                         <a class="collapse-item" href="{% url 'user:shop' %}">Your products</a>
                     </div>
                 </div>

@@ -18,6 +18,9 @@
                     <form method="post" action="{% url 'user:profile' %}" enctype="multipart/form-data">{% csrf_token %}
                         <div class="row">
                             <div class="col-6">
+                                {{ form.nickname|as_crispy_field }}
+                            </div>
+                            <div class="col-6">
                                 {{ form.username|as_crispy_field }}
                             </div>
                             <div class="col-6">

@@ -8,6 +8,7 @@ from .forms import (
     SellerRegisterForm,
     SellerRequestApprove,
     )
+from .mixins import SuperAndStaffAccessMixin
 from .models import User,UserSellerInfo
 from base.models import TheProduct
 from django.urls import reverse_lazy,reverse
@@ -65,12 +66,12 @@ class SellerRegisterFormView(CreateView):
     def get_success_url(self) -> str:
         return reverse_lazy("user:seller-request-detail",kwargs={'user_id': user_id})
 
-class NewSellerRequests(ListView):
+class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
     template_name = "user/new_seller_request.html"
     context_object_name = "Seller_informations"
 
-class SellerRequest(UpdateView):
+class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     form_class = SellerRequestApprove
     template_name = "user/seller_request_approve.html"
     context_object_name = "SellerRequestDetails"
@@ -107,8 +108,8 @@ class AccountView(LoginRequiredMixin,UpdateView):
     def get_object(self):
         return User.objects.get(pk = self.request.user.pk)
     
-    def get_form_kwargs(self):
-        kwargs = super(AccountView, self).get_form_kwargs()
+    def get_form_kwargs(self,**kwargs):
+        kwargs = super(AccountView, self).get_form_kwargs(**kwargs)
         kwargs['user'] = self.request.user  # Pass 'user' directly to the form
         return kwargs
 

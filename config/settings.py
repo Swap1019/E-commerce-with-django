@@ -140,4 +140,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 STAR_RATINGS_RERATE_SAME_DELETE = True
 AUTH_USER_MODEL = "user.User"
-AUTH_PROFILE_MODULE = "user.User"
+AUTH_PROFILE_MODULE = "profiles.User"
