@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from .models import User,UserSellerInfo
+from base.models import TheProduct
 
-class SignupForm(UserCreationForm):
+class SignUpForm(UserCreationForm):
     #User signup form
     email = forms.EmailField(max_length=200,required=True,widget= forms.EmailInput
                            (attrs={'placeholder':'Email','style':'margin-bottom:7px;'}))
@@ -15,10 +16,10 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('profile','nickname','username','first_name','last_name','email')
+        fields = ['profile','nickname','username','first_name','last_name','email']
     
     def __init__(self, *args, **kwargs):
-        super(SignupForm, self).__init__(*args, **kwargs)
+        super(SignUpForm, self).__init__(*args, **kwargs)
         self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password','style':'margin-bottom:7px;'})
         self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password confirmation','style':'margin-bottom:7px;'})
     
@@ -49,7 +50,7 @@ class SellerRegisterForm(forms.ModelForm):
     #User SellerRegisterForm
     class Meta:
         model = UserSellerInfo
-        fields = "__all__"
+        fields = '__all__'
         exclude = ['user_id']
 
 
@@ -68,4 +69,11 @@ class SellerRequestApprove(forms.ModelForm):
         #review_status is enabled
     class Meta:
         model = User
-        fields = ['username','first_name','last_name','email','is_staff','is_seller','date_joined','admin_reject_reason']
+        fields = ['username','first_name','last_name','email','is_staff','is_seller','date_joined']
+
+class AddProductForm(forms.ModelForm):
+
+    class Meta:
+        model = TheProduct
+        fields = '__all__'
+        exclude = ['created_by','hits','ratings']

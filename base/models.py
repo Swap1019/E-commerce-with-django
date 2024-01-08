@@ -6,6 +6,7 @@ from user.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
 from django.db.models import Count
+from comment.models import Comment
 
 class IPAddress(models.Model):
     ip_address = models.GenericIPAddressField(verbose_name="ip_address")
@@ -68,6 +69,7 @@ class TheProduct(models.Model):
     availability = models.CharField(max_length=1,choices=status,default='u')
     hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
     ratings = GenericRelation(Rating, related_query_name='products')
+    comments = GenericRelation(Comment)
     def __str__(self):
         return self.product
     

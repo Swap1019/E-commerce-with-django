@@ -18,12 +18,7 @@ class User(AbstractUser):
     is_seller = models.CharField(default='N',max_length=1,choices=is_seller_status,verbose_name='seller')
     user_id = models.UUIDField(default = uuid.uuid4,editable = False,unique=True)
     profile = models.ImageField(upload_to="user_profile",blank=True,null=True)
-    admin_reject_reason = models.TextField(default='Not reviewed yet')
 
-
-
-
-    
 
 
 class UserSellerInfo(models.Model):

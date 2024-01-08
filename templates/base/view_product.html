@@ -1,7 +1,9 @@
 {% extends "star_ratings/widget.html" %}
 {% load static %}
 {% load ratings %}
+{% load comment_tags %}
 {% block rating_detail %}
+
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -84,6 +86,7 @@
             </div>
         </section>
         {% endif %}
+        {% render_comments product request %}
         <!-- Footer-->
         <footer class="py-5 bg-dark">
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>

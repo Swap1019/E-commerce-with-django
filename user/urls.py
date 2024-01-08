@@ -15,6 +15,7 @@ from .views import (
     ShopMostRatedProductsView,
     ShopNewArrivalProductsView,
     ShopUnavailableProductsView,
+    AddProduct
     )
 
 app_name = "user"
@@ -34,5 +35,6 @@ urlpatterns = [
     path('shop/mostrated',ShopMostRatedProductsView.as_view(),name='shop_mostrated'),
     path('shop/newarrivals',ShopNewArrivalProductsView.as_view(),name='shop_newarrivals'),
     path('shop/unavailables',ShopUnavailableProductsView.as_view(),name='shop_unavailables'),
+    path('shop/addproduct',AddProduct.as_view(),name='add_product'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

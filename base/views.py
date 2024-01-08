@@ -28,6 +28,7 @@ class product(DetailView):
     def get_object(self):
         id = self.kwargs.get('id')
         product = get_object_or_404(TheProduct,id=id)
+        print(product.comments)
 
         ip_address = self.request.user.ip_address
         if ip_address not in product.hits.all():
@@ -43,7 +44,7 @@ class product(DetailView):
         related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
         context['related_products'] = related_products
         if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get().profile
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
 
         return context
     

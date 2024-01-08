@@ -3,22 +3,21 @@ from django.db.models.query import QuerySet
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import (
-    SignupForm,
+    SignUpForm,
     UserProfileForm,
     SellerRegisterForm,
     SellerRequestApprove,
+    AddProductForm,
     )
-from .mixins import SuperAndStaffAccessMixin
+from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo
 from base.models import TheProduct
 from django.urls import reverse_lazy,reverse
 from django.views.generic import CreateView,ListView,UpdateView,DetailView
 from django.contrib.auth.views import LoginView,LogoutView
 
-#----------Form views-----------
-
 class Register(CreateView):
-    form_class = SignupForm
+    form_class = SignUpForm
     template_name = "user/register.html"
 
     def form_valid(self,form):
@@ -63,7 +62,7 @@ class SellerRegisterFormView(CreateView):
         instance.save()
         return super().post(self)
 
-    def get_success_url(self) -> str:
+    def get_success_url(self):
         return reverse_lazy("user:seller-request-detail",kwargs={'user_id': user_id})
 
 class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
@@ -72,6 +71,7 @@ class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     context_object_name = "Seller_informations"
 
 class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
+    #Request approve view
     form_class = SellerRequestApprove
     template_name = "user/seller_request_approve.html"
     context_object_name = "SellerRequestDetails"
@@ -97,8 +97,6 @@ class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
 		})  
         return kwargs
 
-#---------User account interface -----------
-
 class AccountView(LoginRequiredMixin,UpdateView):
     model = User
     form_class = UserProfileForm
@@ -112,8 +110,10 @@ class AccountView(LoginRequiredMixin,UpdateView):
         kwargs = super(AccountView, self).get_form_kwargs(**kwargs)
         kwargs['user'] = self.request.user  # Pass 'user' directly to the form
         return kwargs
+    
+#---------Seller interface -----------
 
-class ShopTotalView(ListView):
+class ShopTotalView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
     context_object_name = "created_products"
 
@@ -122,7 +122,7 @@ class ShopTotalView(ListView):
         return TheProduct.objects.filter(created_by = self.request.user.user_id)
 
 
-class ShopMostViewedProductsView(ListView):
+class ShopMostViewedProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
     context_object_name = "created_products"
 
@@ -130,7 +130,7 @@ class ShopMostViewedProductsView(ListView):
         #gets the most viewed products that were created by the user
         return TheProduct.objects.mostviewedproducts(created_by = self.request.user.user_id)
 
-class ShopMostRatedProductsView(ListView):
+class ShopMostRatedProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
     context_object_name = "created_products"
 
@@ -138,7 +138,7 @@ class ShopMostRatedProductsView(ListView):
         #gets the most rated products that were created by the user
         return TheProduct.objects.mostratedproducts(created_by = self.request.user.user_id)
 
-class ShopNewArrivalProductsView(ListView):
+class ShopNewArrivalProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
     context_object_name = "created_products"
 
@@ -146,12 +146,21 @@ class ShopNewArrivalProductsView(ListView):
         #gets the new arrival products that were created by the user
         return TheProduct.objects.newarrivals(created_by = self.request.user.user_id)
 
-class ShopUnavailableProductsView(ListView):
+class ShopUnavailableProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
     context_object_name = "created_products"
 
     def get_queryset(self):
         #gets the unavailable products that were created by the user
         return TheProduct.objects.unavailables(created_by = self.request.user.user_id)
+    
+class AddProduct(SellerAccessMixin,CreateView):
+    form_class = AddProductForm
+    template_name = 'user/add_product.html'
+    success_url = reverse_lazy('user:add_product')
 
-
+    def form_valid(self, form):
+        #automaticly insert the user_id
+        form.instance.created_by = get_object_or_404(User,user_id = self.request.user.user_id)
+        form.save()
+        return super().form_valid(form)
