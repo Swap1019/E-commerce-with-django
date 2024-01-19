@@ -10,7 +10,11 @@ class home(ListView):
     template_name = "base/list_page.html"
     #pass the products
     context_object_name = 'products'
-    model = TheProduct
+    
+    def get_queryset(self):
+        #gets the most viewed products that were created by the user
+        return TheProduct.objects.filter(availability='A')
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
@@ -26,9 +30,7 @@ class product(DetailView):
     model = TheProduct
     #gets the specified product
     def get_object(self):
-        id = self.kwargs.get('id')
-        product = get_object_or_404(TheProduct,id=id)
-        print(product.comments)
+        product = get_object_or_404(TheProduct,id=self.kwargs.get('id'))
 
         ip_address = self.request.user.ip_address
         if ip_address not in product.hits.all():
@@ -45,19 +47,22 @@ class product(DetailView):
         context['related_products'] = related_products
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
 
         return context
     
 class NewArrivalsView(ListView):
     template_name = "base/list_page.html"
     context_object_name = "products"
-    queryset = TheProduct.objects.newarrivals()
+    queryset = TheProduct.objects.new_arrivals()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
-        context['user_profile'] = User.objects.get().profile
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context
     
 class MostViewedProducts(ListView):
@@ -66,13 +71,15 @@ class MostViewedProducts(ListView):
 
     def get_queryset(self):
         #gets the most viewed products
-        return TheProduct.objects.mostviewedproducts()
+        return TheProduct.objects.most_viewed_products()
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
-        context['user_profile'] = User.objects.get().profile
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context
     
 class MostRatedProducts(ListView):
@@ -80,11 +87,13 @@ class MostRatedProducts(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        return TheProduct.objects.mostratedproducts()
+        return TheProduct.objects.most_rated_products()
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
         context['background_pic'] = page_pic.objects.get().website_pic
-        context['user_profile'] = User.objects.get().profile
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context

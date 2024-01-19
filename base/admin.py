@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import TheProduct,page_pic,product_category
-from django.utils.html import mark_safe
 # Register your models here.
 
 class TheProduct_admin(admin.ModelAdmin):

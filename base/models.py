@@ -20,43 +20,47 @@ class product_category(models.Model):
     status = models.BooleanField(default=True, verbose_name='Make it publish')
     position = models.IntegerField(verbose_name='position')
 
+    def __str__(self):
+        return self.title
+    
+
 class TheProductManager(models.Manager):
     def availables(self,**kwargs):
-        return super().get_queryset().filter(availability="a")
+        return super().get_queryset().filter(availability="A")
     
     def unavailables(self,**kwargs):
-        return super().get_queryset().filter(availability="u")
+        return super().get_queryset().filter(availability="U")
 
-    def newarrivals(self,**kwargs):
+    def new_arrivals(self,**kwargs):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
-        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="a")
+        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="A")
     
-    def mostratedproducts(self,**kwargs):
+    def most_rated_products(self,**kwargs):
         return super().get_queryset().filter(ratings__isnull=False).order_by('-ratings__average')
 
-    def mostviewedproducts(self,**kwargs):
-        return super().get_queryset().filter(availability="a").annotate(
+    def most_viewed_products(self,**kwargs):
+        return super().get_queryset().filter(availability="A").annotate(
             count=Count('hits')).order_by('-count')
         
 class TheProduct(models.Model):
     product = models.CharField(max_length=50, verbose_name="product")
     period_choices = (
-        ('1',"one_months"),
-        ('3',"three_months"),
-        ('6',"six_months"),
+        ('1',"One_months"),
+        ('3',"Three_months"),
+        ('6',"Six_months"),
     )
     users = (
-        ('1','one'),
-        ('2','two'),
-        ('3','three'),
-        ('4','four'),
-        ('5','five'),
+        ('1','One'),
+        ('2','Two'),
+        ('3','Three'),
+        ('4','Four'),
+        ('5','Five'),
     )
     status = (
-        ('a','available'),
-        ('u','unavailable'),
-        ('c','checking_product'),
+        ('A','Available'),
+        ('U','Unavailable'),
+        ('I','Investigate'),
     )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
@@ -66,12 +70,16 @@ class TheProduct(models.Model):
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
     max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
     imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
-    availability = models.CharField(max_length=1,choices=status,default='u')
+    availability = models.CharField(max_length=1,choices=status,default='I')
     hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
     ratings = GenericRelation(Rating, related_query_name='products')
     comments = GenericRelation(Comment)
     def __str__(self):
         return self.product
+    
+    def category_names(self):
+        return ', '.join([a.title for a in self.category.all()])
+    category_names.short_description = "Admin Names"
     
     def pic_sample_preview(self):
         return mark_safe(f'<img src = "{self.pic_sample.url}" width = "120" height="120" style="border-radius: 5px"/>')

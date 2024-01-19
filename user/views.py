@@ -6,8 +6,9 @@ from .forms import (
     SignUpForm,
     UserProfileForm,
     SellerRegisterForm,
-    SellerRequestApprove,
+    SellerRequestApproveForm,
     AddProductForm,
+    NewProductApproveForm,
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo
@@ -42,7 +43,7 @@ class UserLogout(LogoutView):
     
 class SellerRegisterFormView(CreateView):
     form_class = SellerRegisterForm
-    template_name = "user/sellerform.html"
+    template_name = "user/seller_form.html"
     success_url = reverse_lazy("user:seller-request-detail")
 
     def form_valid(self, form):
@@ -72,7 +73,7 @@ class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
 
 class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     #Request approve view
-    form_class = SellerRequestApprove
+    form_class = SellerRequestApproveForm
     template_name = "user/seller_request_approve.html"
     context_object_name = "SellerRequestDetails"
     success_url = reverse_lazy("user:new-seller-requests")
@@ -96,9 +97,29 @@ class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
 			'user': self.request.user
 		})  
         return kwargs
+    
+class NewProducts(SuperAndStaffAccessMixin,ListView):
+    template_name = 'user/new_products_added.html'
+    context_object_name = 'newproducts'
+
+    def get_queryset(self):
+        return TheProduct.objects.filter(availability='I')
+    
+
+class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
+    """Update the template"""
+    template_name = 'user/new_product_added_approve.html'
+    form_class = NewProductApproveForm
+    context_object_name = 'product'
+    
+
+    def get_object(self):
+        return TheProduct.objects.get(id = self.kwargs.get('id'))
+
+
+    
 
 class AccountView(LoginRequiredMixin,UpdateView):
-    model = User
     form_class = UserProfileForm
     template_name = "user/profile.html"
     success_url = reverse_lazy("user:profile")

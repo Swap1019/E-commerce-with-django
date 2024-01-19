@@ -1,0 +1,31 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">               
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Check Products</h1>
+    </div>
+    <div class="container">
+      <hr>
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-left">  
+          {% for newproduct in newproducts %}
+            <div class="card">
+              <img src="{{ newproduct.pic_sample.url }}" width = "100" height="200" style="border-radius: 5px"  class="card-img-top">
+              <div class="card-body">
+                <h5 class="card-title">{{newproduct.product}}</h5>
+                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'user:new_products_approve' newproduct.id %}">View</a></div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">Last updated 3 mins ago</small>
+              </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>                
+    
+        
+        
+    
+{% endblock %}

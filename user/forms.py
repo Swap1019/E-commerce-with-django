@@ -54,11 +54,11 @@ class SellerRegisterForm(forms.ModelForm):
         exclude = ['user_id']
 
 
-class SellerRequestApprove(forms.ModelForm):
+class SellerRequestApproveForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         user = kwargs.pop('user')
         
-        super(SellerRequestApprove, self).__init__(*args, **kwargs) 
+        super(SellerRequestApproveForm, self).__init__(*args, **kwargs) 
         self.fields['first_name'].disabled = True
         self.fields['last_name'].disabled = True 
         self.fields['email'].disabled = True
@@ -71,8 +71,17 @@ class SellerRequestApprove(forms.ModelForm):
         model = User
         fields = ['username','first_name','last_name','email','is_staff','is_seller','date_joined']
 
-class AddProductForm(forms.ModelForm):
+class NewProductApproveForm(forms.ModelForm):
+    def __init__(self,*args, **kwargs):
+        super(NewProductApproveForm, self).__init__(*args, **kwargs) 
+        self.fields['created_by'].disabled = True
+        self.fields['hits'].disabled = True
 
+    class Meta:
+        model = TheProduct
+        fields = '__all__'
+
+class AddProductForm(forms.ModelForm):
     class Meta:
         model = TheProduct
         fields = '__all__'
