@@ -56,14 +56,25 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'base:home' %}">All Products</a></li>
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" href="{% url 'base:mostviewed' %}">Most Viewed</a></li>
-                                <li><a class="dropdown-item" href="{% url 'base:mostrated' %}">Popular Items</a></li>
-                                <li><a class="dropdown-item" href="{% url 'base:newarrivals' %}">New Arrivals</a></li>
+                                <li><a class="dropdown-item" href="{% url 'base:most_viewed' %}">Most Viewed</a></li>
+                                <li><a class="dropdown-item" href="{% url 'base:most_rated' %}">Popular Items</a></li>
+                                <li><a class="dropdown-item" href="{% url 'base:new_arrivals' %}">New Arrivals</a></li>
                             </ul>
                         </li>
                         <!--End of Shop specifying-->
                     </ul>
                 </div>
+                <!--Search bar-->
+                <div class="input-group d-flex">
+                    <form action="{% url 'base:home_search' %}">
+                        {% csrf_token %}
+                        <div class="input-group ms-lg-5">
+                            <button class="btn btn-primary" type="submit" id="button-addon1">Button</button>
+                            <input type="text" name = "SearchQuery" class="form-control" placeholder="Search by Name" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                        </div>
+                    </form>
+                </div>
+                <!--End of Search bar-->
             </div>
         </nav>
 

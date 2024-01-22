@@ -1,19 +1,15 @@
-from django.db.models import Q,Count
-from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView,DetailView
 from .models import TheProduct,page_pic
 from user.models import User
-from datetime import datetime,timedelta
 
-class home(ListView):
+class Home(ListView):
     template_name = "base/list_page.html"
-    #pass the products
     context_object_name = 'products'
     
     def get_queryset(self):
         #gets the most viewed products that were created by the user
-        return TheProduct.objects.filter(availability='A')
+        return TheProduct.objects.availables()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -24,7 +20,16 @@ class home(ListView):
             context['username'] = User.objects.get(pk=self.request.user.pk).username
         return context
     
-class product(DetailView):
+class HomeSearch(ListView):
+    model = TheProduct
+    template_name = "base/list_page.html"
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        query = self.request.GET.get('SearchQuery')
+        return TheProduct.objects.filter(product__icontains=query).order_by('-hits').distinct()
+    
+class Product(DetailView):
     template_name = 'base/view_product.html'
     context_object_name = 'product'
     model = TheProduct

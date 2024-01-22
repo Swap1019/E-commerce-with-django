@@ -71,7 +71,7 @@
                         <h6 class="collapse-header">Status</h6>
                         <a class="collapse-item" href="{% url 'user:profile' %}">Profile</a>
                         {% if user.is_superuser %}
-                            <a class="collapse-item" href="{% url 'user:new-seller-requests' %}">New seller requests</a>
+                            <a class="collapse-item" href="{% url 'user:new_seller_requests' %}">New seller requests</a>
                             <a class="collapse-item" href="{% url 'user:new_products' %}">New products added</a>
                         {% endif %}
                         {% if user.is_seller == 'A' %}
