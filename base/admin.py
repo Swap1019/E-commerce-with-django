@@ -4,7 +4,7 @@ from .models import TheProduct,page_pic,product_category
 
 class TheProduct_admin(admin.ModelAdmin):
     list_display = ('product','pic_sample_preview','price','imported_at','availability','created_by')
-    search_fields = (['product'])
+    search_fields = ('product','tags')
 
 class page_pic_admin(admin.ModelAdmin):
     list_display = (['website_pic'])

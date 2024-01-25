@@ -28,8 +28,8 @@ urlpatterns = [
     path('login/',UserLogin.as_view(),name='login'),
     path('logout/',UserLogout.as_view(),name='logout'),
     path('seller-register/',SellerRegisterFormView.as_view(),name='seller_register'),
-    path('new-seller-requests/',NewSellerRequests.as_view(),name='new-seller_requests'),
-    path('seller-request/<uuid:user_id>',SellerRequest.as_view(),name='seller_request-detail'),
+    path('new-seller-requests/',NewSellerRequests.as_view(),name='new_seller_requests'),
+    path('seller-request/<uuid:user_id>',SellerRequest.as_view(),name='seller_request_detail'),
     #user interface urls
     path('profile/',AccountView.as_view(),name='profile'),
     path('shop/',ShopTotalView.as_view(),name='shop'),

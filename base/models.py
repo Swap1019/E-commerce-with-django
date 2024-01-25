@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
 from django.db.models import Count
 from comment.models import Comment
+from taggit.managers import TaggableManager
 
 class IPAddress(models.Model):
     ip_address = models.GenericIPAddressField(verbose_name="ip_address")
@@ -72,6 +73,7 @@ class TheProduct(models.Model):
     imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
     availability = models.CharField(max_length=1,choices=status,default='I')
     hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
+    tags = TaggableManager()
     ratings = GenericRelation(Rating, related_query_name='products')
     comments = GenericRelation(Comment)
     def __str__(self):

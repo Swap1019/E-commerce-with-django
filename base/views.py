@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView,DetailView
 from .models import TheProduct,page_pic
+from django.db.models import Q
 from user.models import User
 
 class Home(ListView):
@@ -27,7 +28,11 @@ class HomeSearch(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('SearchQuery')
-        return TheProduct.objects.filter(product__icontains=query).order_by('-hits').distinct()
+        return TheProduct.objects.filter(
+            Q(product__icontains=query) |
+            Q(tags__name__icontains=query),
+            availability="A"
+        ).order_by('-hits').distinct()
     
 class Product(DetailView):
     template_name = 'base/view_product.html'
