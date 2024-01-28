@@ -1,5 +1,5 @@
 from typing import Any
-from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import (
@@ -68,8 +68,20 @@ class SellerRegisterFormView(CreateView):
 
 class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
-    template_name = "user/new_seller_request.html"
+    template_name = "user/new_seller_requests.html"
     context_object_name = "Seller_informations"
+
+class NewSellerRequestsSearch(ListView):
+    model = UserSellerInfo
+    template_name = "user/new_seller_requests.html"
+    context_object_name = 'Seller_informations'
+
+    def get_queryset(self):
+        query = self.request.GET.get('SearchQuery')
+        return UserSellerInfo.objects.filter(
+            Q(user_id__icontains=query) |
+            Q(national_code__icontains=query),
+        ).distinct()
 
 class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     #Request approve view
@@ -105,6 +117,20 @@ class NewProducts(SuperAndStaffAccessMixin,ListView):
     def get_queryset(self):
         return TheProduct.objects.filter(availability='I')
     
+
+class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
+    """modify the query"""
+    model = TheProduct
+    template_name = "user/new_products_added.html"
+    context_object_name = 'newproducts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('SearchQuery')
+        return TheProduct.objects.filter(
+            Q(product__icontains=query) |
+            Q(tags__name__icontains=query),
+            availability="I"
+        ).distinct()
 
 class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
     """Update the template"""
@@ -149,7 +175,7 @@ class ShopMostViewedProductsView(SellerAccessMixin,ListView):
 
     def get_queryset(self):
         #gets the most viewed products that were created by the user
-        return TheProduct.objects.mostviewedproducts(created_by = self.request.user.user_id)
+        return TheProduct.objects.most_viewed_products(created_by = self.request.user.user_id)
 
 class ShopMostRatedProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
@@ -157,7 +183,7 @@ class ShopMostRatedProductsView(SellerAccessMixin,ListView):
 
     def get_queryset(self):
         #gets the most rated products that were created by the user
-        return TheProduct.objects.mostratedproducts(created_by = self.request.user.user_id)
+        return TheProduct.objects.most_rated_products(created_by = self.request.user.user_id)
 
 class ShopNewArrivalProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
@@ -165,7 +191,7 @@ class ShopNewArrivalProductsView(SellerAccessMixin,ListView):
 
     def get_queryset(self):
         #gets the new arrival products that were created by the user
-        return TheProduct.objects.newarrivals(created_by = self.request.user.user_id)
+        return TheProduct.objects.new_arrivals(created_by = self.request.user.user_id)
 
 class ShopUnavailableProductsView(SellerAccessMixin,ListView):
     template_name = "user/shop.html"
@@ -174,6 +200,18 @@ class ShopUnavailableProductsView(SellerAccessMixin,ListView):
     def get_queryset(self):
         #gets the unavailable products that were created by the user
         return TheProduct.objects.unavailables(created_by = self.request.user.user_id)
+    
+class ShopSearch(SellerAccessMixin,ListView):
+    model = TheProduct
+    template_name = "user/shop.html"
+    context_object_name = 'created_products'
+
+    def get_queryset(self):
+        query = self.request.GET.get('SearchQuery')
+        return TheProduct.objects.filter(
+            Q(product__icontains=query) |
+            Q(tags__name__icontains=query),
+        ).order_by('-hits').distinct()
     
 class AddProduct(SellerAccessMixin,CreateView):
     form_class = AddProductForm

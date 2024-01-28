@@ -1,5 +1,23 @@
 {% extends 'user/base.html' %}
 {% load static %}
+
+{% block search-bar %}
+<form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+  action="{% url 'user:shop_search' %}">
+  {% csrf_token %}
+    <div class="input-group">
+      <input type="text" name = "SearchQuery" class="form-control bg-light border-0 small" placeholder="Search for..."
+        aria-label="Search" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+          <button class="btn btn-primary" type="button">
+            <i class="fas fa-search fa-sm"></i>
+          </button>
+      </div>
+    </div>
+</form>
+{% endblock %}
+
+
 {% block content %}
 <div class="container-fluid">               
     <!-- Page Heading -->
@@ -13,7 +31,7 @@
               <img src="{{ Seller_information.identity_certificate.url }}" width = "100" height="200" style="border-radius: 5px"  class="card-img-top">
               <div class="card-body">
                 <h5 class="card-title">{{Seller_information.first_name}} {{Seller_information.last_name}}</h5>
-                <a href="{% url 'user:seller-request-detail' Seller_information.user_id %}">See User's request</a>
+                <a href="{% url 'user:seller_request_detail' Seller_information.user_id %}">See User's request</a>
               </div>
               <div class="card-footer">
                 <small class="text-muted">Last updated 3 mins ago</small>
