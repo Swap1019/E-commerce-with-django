@@ -25,7 +25,7 @@ class Register(CreateView):
         user = form.save(commit=False)
         user.is_active = True
         user.save()
-        return HttpResponseRedirect(reverse('user:profile'))
+        return HttpResponseRedirect(reverse('user:login'))
 
 
 class UserLogin(LoginView):
@@ -44,7 +44,7 @@ class UserLogout(LogoutView):
 class SellerRegisterFormView(CreateView):
     form_class = SellerRegisterForm
     template_name = "user/seller_form.html"
-    success_url = reverse_lazy("user:seller-request-detail")
+    success_url = reverse_lazy("user:seller_request_detail")
 
     def form_valid(self, form):
         # Use the user_id as global
@@ -64,14 +64,14 @@ class SellerRegisterFormView(CreateView):
         return super().post(self)
 
     def get_success_url(self):
-        return reverse_lazy("user:seller-request-detail",kwargs={'user_id': user_id})
+        return reverse_lazy("user:profile")
 
 class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
     template_name = "user/new_seller_requests.html"
     context_object_name = "Seller_informations"
 
-class NewSellerRequestsSearch(ListView):
+class NewSellerRequestsSearch(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
     template_name = "user/new_seller_requests.html"
     context_object_name = 'Seller_informations'
@@ -81,14 +81,14 @@ class NewSellerRequestsSearch(ListView):
         return UserSellerInfo.objects.filter(
             Q(user_id__icontains=query) |
             Q(national_code__icontains=query),
-        ).distinct()
+        )
 
 class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     #Request approve view
     form_class = SellerRequestApproveForm
     template_name = "user/seller_request_approve.html"
     context_object_name = "SellerRequestDetails"
-    success_url = reverse_lazy("user:new-seller-requests")
+    success_url = reverse_lazy("user:new_seller_requests")
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         # get the seller information for displaying the details
@@ -130,7 +130,7 @@ class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
             Q(product__icontains=query) |
             Q(tags__name__icontains=query),
             availability="I"
-        ).distinct()
+        )
 
 class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
     """Update the template"""

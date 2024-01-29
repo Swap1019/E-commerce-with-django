@@ -48,6 +48,7 @@ class UserProfileForm(UserChangeForm):
 
 class SellerRegisterForm(forms.ModelForm):
     #User SellerRegisterForm
+
     class Meta:
         model = UserSellerInfo
         fields = '__all__'
