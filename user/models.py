@@ -4,10 +4,6 @@ from django.utils.html import mark_safe
 import uuid
 # Create your models here.
 
-class UserManager(models.Manager):
-    def New_Requests(self):
-        return super.get_queryset().filter(is_seller="I")
-
 class User(AbstractUser):
     nickname = models.CharField(max_length=50,verbose_name="Nick Name",default='User')
     is_seller_status = (
@@ -34,3 +30,13 @@ class UserSellerInfo(models.Model):
         return mark_safe(f'<img src = "{self.identity_certificate.url}" width = "120" height="120" style="border-radius: 5px"/>')
     identity_view.short_description = 'identity'
 
+class ReportedProduct(models.Model):
+    reasons = (
+        ('1',"NSFW"),
+        ('2',"Fake Product"),
+        ('3',"Scam"),
+    )
+    reported_product = models.ForeignKey('base.TheProduct',on_delete=models.CASCADE)
+    user = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE)
+    reason = models.CharField(max_length=1,choices=reasons)
+    explanation = models.TextField()

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
-from .models import User,UserSellerInfo
+from .models import User,UserSellerInfo,ReportedProduct
 from base.models import TheProduct
 
 class SignUpForm(UserCreationForm):
@@ -87,3 +87,9 @@ class AddProductForm(forms.ModelForm):
         model = TheProduct
         fields = '__all__'
         exclude = ['created_by','hits','ratings']
+
+class ReportProductForm(forms.ModelForm):
+    class Meta:
+        model = ReportedProduct
+        fields = '__all__'
+        exclude = ['reported_product','user']

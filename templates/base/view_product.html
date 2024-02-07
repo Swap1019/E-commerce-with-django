@@ -3,7 +3,6 @@
 {% load ratings %}
 {% load comment_tags %}
 {% block rating_detail %}
-
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -13,12 +12,35 @@
         <title>Shop Item - Start Bootstrap Template</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
+        
         <!-- Bootstrap icons-->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
+        <link rel="stylesheet" href="{% static '/base/css/bootstrap.min.css' %}">
+        
+        <!--Fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static '/base/css/fonts/icomoon/style.css' %}">
+        
+    
+        <!-- Style -->
+        <link rel="stylesheet" href="{% static 'base/css/styles.css' %}">
     </head>
-    <body>
+    <body>  
+        <!--Report Success Messsage-->
+        {% if messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
         <!-- Navbar -->
         {% include 'base/navbar.html' %}
         <!-- Product section-->
@@ -50,10 +72,38 @@
                                 <i class="bi-cart-fill me-1"></i>
                                 Add to cart
                             </button>
+                            <button type="button" class="btn btn-secondary px-4 py-3" data-toggle="modal" data-target="#exampleModalCenter">
+                                Launch modal
+                            </button>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+            <!-- Modal -->
+                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content rounded-0">
+                            <div class="modal-body p-4 px-5">
+                                <div class="main-content text-center">
+                                </br>
+                                    <i class="bi bi-exclamation-triangle mt-5"></i>
+                                    <form class="form-group" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <h4>Report this product</h4>
+                                        <div class="form-group mb-4">
+                                            {{ form.as_p }}
+                                        </div>
+                                        <div class="d-flex">
+                                            <div class="mx-auto">
+                                                <input type="submit" value="Confirm">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
         <!-- Related items section-->
         {% if related_products %}
@@ -99,6 +149,12 @@
         <!-- django-star-ratings call-->
         <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
         <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>        
+        <!--Modal Js-->
+        <script src="{% static '/base/js/jquery-3.3.1.min.js' %}"></script>
+        <script src="{% static '/base/js/popper.min.js' %}"></script>
+        <script src="{% static '/base/js/bootstrap.min.js' %}"></script>
+        <script src="{% static '/base/js/main.js' %}"></script>
+        
     </body>   
 </html>
 {% endblock %}
