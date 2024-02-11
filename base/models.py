@@ -62,6 +62,7 @@ class TheProduct(models.Model):
         ('A','Available'),
         ('U','Unavailable'),
         ('I','Investigate'),
+        ('B','Banned')
     )
     category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
@@ -71,7 +72,7 @@ class TheProduct(models.Model):
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
     max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
     imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
-    availability = models.CharField(max_length=1,choices=status,default='I')
+    availability = models.CharField(max_length=1,choices=status,default='I',verbose_name='Status')
     hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
     tags = TaggableManager()
     ratings = GenericRelation(Rating, related_query_name='products')

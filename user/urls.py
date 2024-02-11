@@ -21,6 +21,9 @@ from .views import (
     NewProducts,
     NewProductsSearch,
     NewProductApprove,
+    ProductReports,
+    ReportedProductView,
+    ProductDeleteView,
     )
 
 app_name = "user"
@@ -46,5 +49,8 @@ urlpatterns = [
     path('newproducts/',NewProducts.as_view(),name='new_products'),
     path('newproducts/search/',NewProductsSearch.as_view(),name='new_products_search'),
     path('newproducts/product/<int:id>',NewProductApprove.as_view(),name='new_products_approve'),
+    path('reportedproducts/',ProductReports.as_view(),name='product_reports'),
+    path('reportedproducts/reportedproduct/<int:id>',ReportedProductView.as_view(),name='reported_product_view'),
+    path('reportedproducts/reportedproduct/<int:id>/delete/',ProductDeleteView.as_view(),name='product_delete_view'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

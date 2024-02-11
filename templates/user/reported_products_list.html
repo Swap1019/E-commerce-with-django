@@ -1,0 +1,32 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">               
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Reported Products</h1>
+    </div>
+    <div class="container mt-5">
+      <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-left">
+
+              {% for reported_product in reported_products %}
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{reported_product.reported_product}}</h5>
+                  <p class="card-text">{{reported_product.get_reason_display}}</p>
+                  <a href="{% url 'user:reported_product_view' reported_product.id %}">Investigate</a>
+                </div>
+                <div class="card-footer">
+                  <small class="text-muted">Last updated 3 mins ago</small>
+                </div>
+              </div>
+              {% endfor %}
+      </div>
+    </div>
+</div>                
+    
+        
+        
+    
+{% endblock %}

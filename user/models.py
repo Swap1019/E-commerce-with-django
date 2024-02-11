@@ -7,9 +7,9 @@ import uuid
 class User(AbstractUser):
     nickname = models.CharField(max_length=50,verbose_name="Nick Name",default='User')
     is_seller_status = (
-                        ('N','Not accepted'),
-                        ('I','Investigate'),
-                        ('A','Accepted')
+                        ('N',"Not accepted"),
+                        ('I',"Investigate"),
+                        ('A',"Accepted")
                         )
     is_seller = models.CharField(default='N',max_length=1,choices=is_seller_status,verbose_name='seller')
     user_id = models.UUIDField(default = uuid.uuid4,editable = False,unique=True)
@@ -37,6 +37,11 @@ class ReportedProduct(models.Model):
         ('3',"Scam"),
     )
     reported_product = models.ForeignKey('base.TheProduct',on_delete=models.CASCADE)
+    id = models.CharField(max_length = 12,primary_key=True)
     user = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE)
     reason = models.CharField(max_length=1,choices=reasons)
     explanation = models.TextField()
+    checked = models.BooleanField(default=False,verbose_name='Investigated')
+
+    def __str__(self):
+        return self.reason

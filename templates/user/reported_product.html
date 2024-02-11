@@ -1,0 +1,45 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<section class="justify-content-center d-flex p-4">
+    <!--User update form-->
+    <div class="main-w3layouts wrapper">
+      <div class="main-agileinfo">
+        <div class="agileits-top">
+          <div class="card mb-3">
+            <div class="card-body">
+              <img class="card-img-top" src="{{product.pic_sample.url}}" width = "200" height="300" />
+              <li class="list-group-item">Product: {{ product.product }}</li>
+              <li class="list-group-item">Created By: {{ product.created_by }}</li>
+              <li class="list-group-item">Price: {{ product.price }}</li>
+              <li class="list-group-item">Description: {{ product.description }}</li>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-w3layouts wrapper">
+      <div class="main-agileinfo">
+        <div class="agileits-top">
+          <form class="form-group" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card mb-3">
+              <div class="card-body">
+                <li class="list-group-item">Product: {{ reportedproduct.reported_product }}</li>
+                <li class="list-group-item">Created By: {{ reportedproduct.user }}</li>
+                <li class="list-group-item">Reason: {{ reportedproduct.get_reason_display }}</li>
+                <li class="list-group-item">Explanation: {{ reportedproduct.explanation }}</li>
+                <li class="list-group-item">{{ form|crispy }}</li>
+                <input type="submit" value="Update" class="btn btn-success">
+                <a href="{% url 'user:product_delete_view' reportedproduct.id %}" class="btn btn-danger" role="button">Delete</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--End of User update form-->
+</section>
+{% endblock %}

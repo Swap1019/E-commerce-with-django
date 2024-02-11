@@ -11,15 +11,15 @@ from .forms import (
     NewProductApproveForm,
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
-from .models import User,UserSellerInfo
+from .models import User,UserSellerInfo,ReportedProduct
 from base.models import TheProduct
 from django.urls import reverse_lazy,reverse
-from django.views.generic import CreateView,ListView,UpdateView,DetailView
+from django.views.generic import CreateView,ListView,UpdateView,DetailView,DeleteView
 from django.contrib.auth.views import LoginView,LogoutView
 
 class Register(CreateView):
     form_class = SignUpForm
-    template_name = "user/register.html"
+    template_name = 'user/register.html'
 
     def form_valid(self,form):
         user = form.save(commit=False)
@@ -43,8 +43,8 @@ class UserLogout(LogoutView):
     
 class SellerRegisterFormView(CreateView):
     form_class = SellerRegisterForm
-    template_name = "user/seller_form.html"
-    success_url = reverse_lazy("user:seller_request_detail")
+    template_name = 'user/seller_form.html'
+    success_url = reverse_lazy('user:seller_request_detail')
 
     def form_valid(self, form):
         # Use the user_id as global
@@ -64,16 +64,16 @@ class SellerRegisterFormView(CreateView):
         return super().post(self)
 
     def get_success_url(self):
-        return reverse_lazy("user:profile")
+        return reverse_lazy('user:profile')
 
 class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
-    template_name = "user/new_seller_requests.html"
-    context_object_name = "Seller_informations"
+    template_name = 'user/new_seller_requests.html'
+    context_object_name = 'Seller_informations'
 
 class NewSellerRequestsSearch(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
-    template_name = "user/new_seller_requests.html"
+    template_name = 'user/new_seller_requests.html'
     context_object_name = 'Seller_informations'
 
     def get_queryset(self):
@@ -86,9 +86,9 @@ class NewSellerRequestsSearch(SuperAndStaffAccessMixin,ListView):
 class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     #Request approve view
     form_class = SellerRequestApproveForm
-    template_name = "user/seller_request_approve.html"
-    context_object_name = "SellerRequestDetails"
-    success_url = reverse_lazy("user:new_seller_requests")
+    template_name = 'user/seller_request_approve.html'
+    context_object_name = 'SellerRequestDetails'
+    success_url = reverse_lazy('user:new_seller_requests')
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         # get the seller information for displaying the details
@@ -119,9 +119,9 @@ class NewProducts(SuperAndStaffAccessMixin,ListView):
     
 
 class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
-    """modify the query"""
+    '''modify the query'''
     model = TheProduct
-    template_name = "user/new_products_added.html"
+    template_name = 'user/new_products_added.html'
     context_object_name = 'newproducts'
 
     def get_queryset(self):
@@ -129,11 +129,11 @@ class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
         return TheProduct.objects.filter(
             Q(product__icontains=query) |
             Q(tags__name__icontains=query),
-            availability="I"
+            availability='I'
         )
 
 class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
-    """Update the template"""
+    '''Update the template'''
     template_name = 'user/new_product_added_approve.html'
     form_class = NewProductApproveForm
     context_object_name = 'product'
@@ -141,14 +141,42 @@ class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
 
     def get_object(self):
         return TheProduct.objects.get(id = self.kwargs.get('id'))
+    
+class ProductReports(SuperAndStaffAccessMixin,ListView):
+    model = ReportedProduct
+    template_name = 'user/reported_products_list.html'
+    context_object_name = 'reported_products'
 
+class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
+    fields = ['checked']
+    template_name = 'user/reported_product.html'
+    context_object_name = 'reportedproduct'
+    success_url = reverse_lazy('user:product_reports')
+    
+    def get_object(self):
+        global id
+        id = self.kwargs.get('id')
+        return get_object_or_404(ReportedProduct,id=id)
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['product'] = TheProduct.objects.get(id=id)
+        return context
 
+class ProductDeleteView(SuperAndStaffAccessMixin,DeleteView):
+    model = TheProduct
+    template_name = 'user/product_delete.html'
+    context_object_name = 'product'
+    success_url = reverse_lazy('user:product_reports')
+
+    def get_object(self):
+        return get_object_or_404(TheProduct,id=self.kwargs.get('id'))
     
 
 class AccountView(LoginRequiredMixin,UpdateView):
     form_class = UserProfileForm
-    template_name = "user/profile.html"
-    success_url = reverse_lazy("user:profile")
+    template_name = 'user/profile.html'
+    success_url = reverse_lazy('user:profile')
 
     def get_object(self):
         return User.objects.get(pk = self.request.user.pk)
@@ -161,8 +189,8 @@ class AccountView(LoginRequiredMixin,UpdateView):
 #---------Seller interface -----------
 
 class ShopTotalView(SellerAccessMixin,ListView):
-    template_name = "user/shop.html"
-    context_object_name = "created_products"
+    template_name = 'user/shop.html'
+    context_object_name = 'created_products'
 
     def get_queryset(self):
         #gets the products that were created by the user
@@ -170,32 +198,32 @@ class ShopTotalView(SellerAccessMixin,ListView):
 
 
 class ShopMostViewedProductsView(SellerAccessMixin,ListView):
-    template_name = "user/shop.html"
-    context_object_name = "created_products"
+    template_name = 'user/shop.html'
+    context_object_name = 'created_products'
 
     def get_queryset(self):
         #gets the most viewed products that were created by the user
         return TheProduct.objects.most_viewed_products(created_by = self.request.user.user_id)
 
 class ShopMostRatedProductsView(SellerAccessMixin,ListView):
-    template_name = "user/shop.html"
-    context_object_name = "created_products"
+    template_name = 'user/shop.html'
+    context_object_name = 'created_products'
 
     def get_queryset(self):
         #gets the most rated products that were created by the user
         return TheProduct.objects.most_rated_products(created_by = self.request.user.user_id)
 
 class ShopNewArrivalProductsView(SellerAccessMixin,ListView):
-    template_name = "user/shop.html"
-    context_object_name = "created_products"
+    template_name = 'user/shop.html'
+    context_object_name = 'created_products'
 
     def get_queryset(self):
         #gets the new arrival products that were created by the user
         return TheProduct.objects.new_arrivals(created_by = self.request.user.user_id)
 
 class ShopUnavailableProductsView(SellerAccessMixin,ListView):
-    template_name = "user/shop.html"
-    context_object_name = "created_products"
+    template_name = 'user/shop.html'
+    context_object_name = 'created_products'
 
     def get_queryset(self):
         #gets the unavailable products that were created by the user
@@ -203,7 +231,7 @@ class ShopUnavailableProductsView(SellerAccessMixin,ListView):
     
 class ShopSearch(SellerAccessMixin,ListView):
     model = TheProduct
-    template_name = "user/shop.html"
+    template_name = 'user/shop.html'
     context_object_name = 'created_products'
 
     def get_queryset(self):

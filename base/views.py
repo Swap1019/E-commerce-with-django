@@ -9,7 +9,7 @@ from user.models import User
 from user.forms import ReportProductForm
 
 class Home(ListView):
-    template_name = "base/list_page.html"
+    template_name = 'base/list_page.html'
     context_object_name = 'products'
     
     def get_queryset(self):
@@ -27,7 +27,7 @@ class Home(ListView):
     
 class HomeSearch(ListView):
     model = TheProduct
-    template_name = "base/list_page.html"
+    template_name = 'base/list_page.html'
     context_object_name = 'products'
 
     def get_queryset(self):
@@ -35,7 +35,7 @@ class HomeSearch(ListView):
         return TheProduct.objects.filter(
             Q(product__icontains=query) |
             Q(tags__name__icontains=query),
-            availability="A"
+            availability='A'
         ).order_by('-hits').distinct()
     
 class Product(FormMixin,DetailView):
@@ -79,6 +79,7 @@ class Product(FormMixin,DetailView):
         #insert user_id and product into form
         form.instance.user = user_id
         form.instance.reported_product = product
+        form.instance.id = product.pk
         form.save()
         return super(Product, self).form_valid(form)
     
@@ -87,8 +88,8 @@ class Product(FormMixin,DetailView):
         return reverse('base:product', kwargs={'id': self.kwargs.get('id')})
     
 class NewArrivalsView(ListView):
-    template_name = "base/list_page.html"
-    context_object_name = "products"
+    template_name = 'base/list_page.html'
+    context_object_name = 'products'
     queryset = TheProduct.objects.new_arrivals()
 
     def get_context_data(self, **kwargs):
@@ -102,8 +103,8 @@ class NewArrivalsView(ListView):
         return context
     
 class MostViewedProducts(ListView):
-    template_name = "base/list_page.html"
-    context_object_name = "products"
+    template_name = 'base/list_page.html'
+    context_object_name = 'products'
 
     def get_queryset(self):
         #gets the most viewed products
@@ -120,8 +121,8 @@ class MostViewedProducts(ListView):
         return context
     
 class MostRatedProducts(ListView):
-    template_name = "base/list_page.html"
-    context_object_name = "products"
+    template_name = 'base/list_page.html'
+    context_object_name = 'products'
 
     def get_queryset(self):
         return TheProduct.objects.most_rated_products()

@@ -10,8 +10,8 @@ class UserSellerInfoAdmin(admin.ModelAdmin):
     search_fields = ('first_name','last_name','national_code','user_id')
 
 class ReportedProductAdmin(admin.ModelAdmin):
-    list_display = ('reported_product','user','reason','explanation')
-    search_fields = ('reported_product','user','reason')
+    list_display = ('reported_product','checked','reason','user','explanation',)
+    search_fields = ('reported_product','user','reason','checked')
     
 
 admin.site.register(User,UserAdmin)

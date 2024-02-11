@@ -92,4 +92,4 @@ class ReportProductForm(forms.ModelForm):
     class Meta:
         model = ReportedProduct
         fields = '__all__'
-        exclude = ['reported_product','user']
+        exclude = ['id','reported_product','user','checked']

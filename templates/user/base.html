@@ -73,6 +73,7 @@
                         {% if user.is_superuser %}
                             <a class="collapse-item" href="{% url 'user:new_seller_requests' %}">New seller requests</a>
                             <a class="collapse-item" href="{% url 'user:new_products' %}">New products added</a>
+                            <a class="collapse-item" href="{% url 'user:product_reports' %}">Reported Products</a>
                         {% endif %}
                         {% if user.is_seller == 'A' %}
                         <a class="collapse-item" href="{% url 'user:shop' %}">Your products</a>
