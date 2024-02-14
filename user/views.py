@@ -143,12 +143,13 @@ class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
         return TheProduct.objects.get(id = self.kwargs.get('id'))
     
 class ProductReports(SuperAndStaffAccessMixin,ListView):
-    model = ReportedProduct
+    queryset = ReportedProduct.objects.filter(checked=False)
     template_name = 'user/reported_products_list.html'
     context_object_name = 'reported_products'
 
 class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
-    fields = ['checked']
+    model = TheProduct
+    fields = ['availability']
     template_name = 'user/reported_product.html'
     context_object_name = 'reportedproduct'
     success_url = reverse_lazy('user:product_reports')
@@ -156,7 +157,9 @@ class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
     def get_object(self):
         global id
         id = self.kwargs.get('id')
-        return get_object_or_404(ReportedProduct,id=id)
+        reportedproduct = get_object_or_404(ReportedProduct,id=id)
+        reportedproduct.checked = True
+        return reportedproduct
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
