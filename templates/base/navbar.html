@@ -28,11 +28,19 @@
                 </ul>
             </div>
             <!--User's cart-->
-            <div class="buttons ms-4">
-                <button class="btn btn-outline-dark d-flex" type="submit">
+            <div class="btn-group ms-4">
+                <a class="btn btn-outline-dark d-flex" href="{% url 'base:cart' %}">
                     <i class="bi-cart-fill me-1"></i>
-                    <span class="badge bg-dark text-white rounded-pill ">0</span>
+                    <span class="badge bg-dark text-white rounded-pill">0</span>
+                </a>
+                <button type="button" class="btn btn-outline-dark dropdown-toggle dropdown-toggle-split" id="dropdownMenuReference" data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                  <span class="visually-hidden">Toggle Dropdown</span>
                 </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuReference">
+                    {% for cart_item in cart %}
+                        <li><a class="dropdown-item" href="#">{{ cart_item.product }}</a></li>
+                    {% endfor %}
+                </ul>
             </div>
             {% else %}
                 <!--Register button-->

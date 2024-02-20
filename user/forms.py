@@ -76,17 +76,20 @@ class NewProductApproveForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super(NewProductApproveForm, self).__init__(*args, **kwargs) 
         self.fields['created_by'].disabled = True
-        self.fields['hits'].disabled = True
 
     class Meta:
         model = TheProduct
-        fields = '__all__'
+        fields = ['pic_sample','product','created_by','category','price','description','period','max_users','availability']
 
 class AddProductForm(forms.ModelForm):
+    def __init__(self,*args, **kwargs):
+        super(AddProductForm, self).__init__(*args, **kwargs) 
+        self.fields['availability'].disabled = True
+
     class Meta:
         model = TheProduct
-        fields = '__all__'
-        exclude = ['created_by','hits','ratings']
+        fields = ['product','category','price','pic_sample','description','period','max_users','availability']
+
 
 class ReportProductForm(forms.ModelForm):
     class Meta:

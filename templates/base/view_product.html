@@ -68,11 +68,8 @@
                             </h3>
                         <p class="lead">Description: {{product.description}}</p>
                         <div class="d-flex">
-                            <button class="btn btn-outline-dark flex-shrink-0" type="button">
-                                <i class="bi-cart-fill me-1"></i>
-                                Add to cart
-                            </button>
-                            <button type="button" class="btn btn-secondary px-4 py-3" data-toggle="modal" data-target="#exampleModalCenter">
+                            <a class="btn btn-outline-warning py-auto px-auto mt-auto" href="{% url 'base:add_to_cart' product.id %}"><i class="bi-cart-fill me-1">Add To Cart</i></a>
+                            <button type="button" class="btn btn-secondary py-auto px-auto mt-auto" data-toggle="modal" data-target="#exampleModalCenter">
                                 Report
                             </button>
                         </div>

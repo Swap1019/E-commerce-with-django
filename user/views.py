@@ -2,6 +2,7 @@ from typing import Any
 from django.db.models import Q
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from .forms import (
     SignUpForm,
     UserProfileForm,
@@ -137,10 +138,11 @@ class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
     template_name = 'user/new_product_added_approve.html'
     form_class = NewProductApproveForm
     context_object_name = 'product'
-    
+    success_url = reverse_lazy('user:new_products')
 
     def get_object(self):
         return TheProduct.objects.get(id = self.kwargs.get('id'))
+    
     
 class ProductReports(SuperAndStaffAccessMixin,ListView):
     queryset = ReportedProduct.objects.filter(checked=False)
@@ -247,7 +249,7 @@ class ShopSearch(SellerAccessMixin,ListView):
 class AddProduct(SellerAccessMixin,CreateView):
     form_class = AddProductForm
     template_name = 'user/add_product.html'
-    success_url = reverse_lazy('user:add_product')
+    success_url = reverse_lazy('user:shop')
 
     def form_valid(self, form):
         #automaticly insert the user_id

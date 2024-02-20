@@ -14,7 +14,7 @@ class IPAddress(models.Model):
     
 
 
-class product_category(models.Model):
+class ProductCategory(models.Model):
     parent = models.ForeignKey('self', default=None, null=True, blank=True, on_delete=models.SET_NULL, related_name='children',verbose_name="parent")
     title = models.CharField(max_length=200,verbose_name='Category-title')
     slug = models.SlugField(max_length=100,unique=True,verbose_name='Category-Addres')
@@ -64,7 +64,7 @@ class TheProduct(models.Model):
         ('I','Investigate'),
         ('B','Banned')
     )
-    category = models.ManyToManyField(product_category,verbose_name='Category',related_name="category")
+    category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name="category")
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
     price = models.IntegerField(verbose_name="price",default=50)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
@@ -91,7 +91,16 @@ class TheProduct(models.Model):
 
     objects = TheProductManager()
 
-class page_pic(SingletonModel):
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity}"
+
+class PagePic(SingletonModel):
     website_pic = models.ImageField(upload_to="images", verbose_name='website_pic')
     class Meta:
         verbose_name = 'website_pic'

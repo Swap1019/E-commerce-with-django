@@ -1,9 +1,13 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.views.generic import ListView,DetailView
+from django.views.generic import ListView,DetailView,View
 from django.views.generic.edit import FormMixin
-from .models import TheProduct,page_pic
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import TheProduct,PagePic,Cart
 from django.db.models import Q
 from user.models import User
 from user.forms import ReportProductForm
@@ -19,10 +23,11 @@ class Home(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
-        context['background_pic'] = page_pic.objects.get().website_pic
+        context['background_pic'] = PagePic.objects.get().website_pic
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user)
         return context
     
 class HomeSearch(ListView):
@@ -37,6 +42,16 @@ class HomeSearch(ListView):
             Q(tags__name__icontains=query),
             availability='A'
         ).order_by('-hits').distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add the background_pic to the context
+        context['background_pic'] = PagePic.objects.get().website_pic
+        if self.request.user.is_authenticated:
+            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
+            context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user)
+        return context
     
 class Product(FormMixin,DetailView):
     template_name = 'base/view_product.html'
@@ -63,6 +78,7 @@ class Product(FormMixin,DetailView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user)
         return context
     
     def post(self, request, *args, **kwargs):
@@ -87,6 +103,30 @@ class Product(FormMixin,DetailView):
         messages.add_message(self.request, messages.INFO, 'Product Reported Successfuly')
         return reverse('base:product', kwargs={'id': self.kwargs.get('id')})
     
+class AddToCartView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        product_id = kwargs.get('id')
+        try:
+            cart = Cart.objects.get(id = product_id,user=request.user)
+            cart.quantity += 1
+            cart.save()
+        except:
+            Cart.objects.create(
+                user=request.user,
+                product=TheProduct.objects.get(id = product_id),
+                quantity=1
+                )
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    
+class UserCartView(LoginRequiredMixin,ListView):
+    template_name = 'base/cart.html'
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+        
+
+    
 class NewArrivalsView(ListView):
     template_name = 'base/list_page.html'
     context_object_name = 'products'
@@ -95,7 +135,7 @@ class NewArrivalsView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
-        context['background_pic'] = page_pic.objects.get().website_pic
+        context['background_pic'] = PagePic.objects.get().website_pic
 
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
@@ -113,7 +153,7 @@ class MostViewedProducts(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
-        context['background_pic'] = page_pic.objects.get().website_pic
+        context['background_pic'] = PagePic.objects.get().website_pic
 
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
@@ -130,7 +170,7 @@ class MostRatedProducts(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add the background_pic to the context
-        context['background_pic'] = page_pic.objects.get().website_pic
+        context['background_pic'] = PagePic.objects.get().website_pic
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
