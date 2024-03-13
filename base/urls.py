@@ -8,7 +8,8 @@ from .views import (
     MostViewedProducts,
     MostRatedProducts,
     AddToCartView,
-    UserCartView
+    UserCartView,
+    UserCartDeleteView,
     )
     
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path('product/<int:id>/',Product.as_view(),name='product'),
     path('addtocart/<int:id>/',AddToCartView.as_view(),name='add_to_cart'),
     path('cart/',UserCartView.as_view(),name='cart'),
+    path('cart/delete/<int:id>',UserCartDeleteView.as_view(),name='cart_delete'),
     path('newarrivals/',NewArrivalsView.as_view(),name='new_arrivals'),
     path('mostviewed/',MostViewedProducts.as_view(),name='most_viewed'),
     path('mostrated/',MostRatedProducts.as_view(),name='most_rated'),

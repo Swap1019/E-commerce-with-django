@@ -8,22 +8,22 @@ from .models import (
 # Register your models here.
 
 class TheProductAdmin(admin.ModelAdmin):
-    list_display = ('product','pic_sample_preview','price','imported_at','availability','created_by')
-    search_fields = ('product','tags')
+    list_display = ('product','pic_sample_preview','price','imported_at','availability','created_by','id')
+    search_fields = ('product','tags','id')
 
 class PagePicAdmin(admin.ModelAdmin):
     list_display = (['website_pic'])
 
 class ProductCategoryAdmin(admin.ModelAdmin):
-    list_display = ('parent','title','slug','status','position')
+    list_display = ('parent','title','slug','status','position','id')
     list_filter = ('parent','title','status','position')
-    search_fields = ('parent', 'title')
+    search_fields = ('parent', 'title','id')
     ordering = ['-status']
 
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('user','product','quantity')
+    list_display = ('user','product','quantity','id')
     list_filter = ('user','product','quantity')
-    search_fields = ('user','product')
+    search_fields = ('user','product','id')
 
 admin.site.register(TheProduct,TheProductAdmin)
 admin.site.register(PagePic,PagePicAdmin)

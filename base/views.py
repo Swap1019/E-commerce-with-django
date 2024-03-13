@@ -1,10 +1,10 @@
 from typing import Any
 from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404,redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.views.generic import ListView,DetailView,View
+from django.views.generic import ListView,DetailView,View,DeleteView
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import TheProduct,PagePic,Cart
@@ -121,11 +121,24 @@ class AddToCartView(LoginRequiredMixin,View):
     
 class UserCartView(LoginRequiredMixin,ListView):
     template_name = 'base/cart.html'
+    context_object_name = 'carts'
 
     def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
-        
+        global cart
+        cart = Cart.objects.filter(user=self.request.user)
+        return cart
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_ids = [product.product_id for product in cart]
+        products = TheProduct.objects.filter(id__in=product_ids)
+        context['product'] = products
+        return context
 
+class UserCartDeleteView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        get_object_or_404(Cart,id=self.kwargs.get('id'),user=self.request.user).delete()
+        return redirect('base:cart')
     
 class NewArrivalsView(ListView):
     template_name = 'base/list_page.html'
