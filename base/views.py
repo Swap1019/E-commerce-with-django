@@ -28,6 +28,7 @@ class Home(ListView):
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
             context['cart'] = Cart.objects.filter(user=self.request.user)
+            context['quantity'] = context['cart'].count()
         return context
     
 class HomeSearch(ListView):
