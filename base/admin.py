@@ -8,7 +8,7 @@ from .models import (
 # Register your models here.
 
 class TheProductAdmin(admin.ModelAdmin):
-    list_display = ('product','pic_sample_preview','price','imported_at','availability','created_by','id')
+    list_display = ('product','pic_sample_preview','price','discount_percentage','final_price','imported_at','availability','created_by','id')
     search_fields = ('product','tags','id')
 
 class PagePicAdmin(admin.ModelAdmin):

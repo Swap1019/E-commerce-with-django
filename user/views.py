@@ -18,6 +18,8 @@ from django.urls import reverse_lazy,reverse
 from django.views.generic import CreateView,ListView,UpdateView,DetailView,DeleteView
 from django.contrib.auth.views import LoginView,LogoutView
 
+
+#----------Authentication------------
 class Register(CreateView):
     form_class = SignUpForm
     template_name = 'user/register.html'
@@ -66,6 +68,21 @@ class SellerRegisterFormView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('user:profile')
+    
+class AccountView(LoginRequiredMixin,UpdateView):
+    form_class = UserProfileForm
+    template_name = 'user/profile.html'
+    success_url = reverse_lazy('user:profile')
+
+    def get_object(self):
+        return User.objects.get(pk = self.request.user.pk)
+    
+    def get_form_kwargs(self,**kwargs):
+        kwargs = super(AccountView, self).get_form_kwargs(**kwargs)
+        kwargs['user'] = self.request.user  # Pass 'user' directly to the form
+        return kwargs
+
+#----------Admin and staff member interface----------
 
 class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
@@ -176,20 +193,6 @@ class ProductDeleteView(SuperAndStaffAccessMixin,DeleteView):
 
     def get_object(self):
         return get_object_or_404(TheProduct,id=self.kwargs.get('id'))
-    
-
-class AccountView(LoginRequiredMixin,UpdateView):
-    form_class = UserProfileForm
-    template_name = 'user/profile.html'
-    success_url = reverse_lazy('user:profile')
-
-    def get_object(self):
-        return User.objects.get(pk = self.request.user.pk)
-    
-    def get_form_kwargs(self,**kwargs):
-        kwargs = super(AccountView, self).get_form_kwargs(**kwargs)
-        kwargs['user'] = self.request.user  # Pass 'user' directly to the form
-        return kwargs
     
 #---------Seller interface -----------
 
