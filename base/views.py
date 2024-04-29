@@ -127,14 +127,14 @@ class UserCartView(LoginRequiredMixin,ListView):
     def get_queryset(self):
         global carts
         carts = Cart.objects.filter(user=self.request.user)
+        print(carts)
         return carts
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product_ids = [product.product_id for product in carts]
         products = TheProduct.objects.filter(id__in=product_ids)
-
-        product_price = [product.price*cart.quantity for product,cart in zip(products,carts)]
+        product_price = [product.final_price*cart.quantity for product,cart in zip(products,carts)]
         context['product'] = products
         context['prices'] = product_price
         context['total'] = sum(product_price)

@@ -67,9 +67,9 @@ class TheProduct(models.Model):
     )
     category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name="category")
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
-    price = models.IntegerField(verbose_name="price",default=50)
+    price = models.DecimalField(max_digits=10, decimal_places=2,verbose_name="price",default=50)
     discount_percentage = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],default=0)
-    final_price = models.IntegerField(verbose_name="final_price")
+    final_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
@@ -80,6 +80,10 @@ class TheProduct(models.Model):
     tags = TaggableManager()
     ratings = GenericRelation(Rating, related_query_name='products')
     comments = GenericRelation(Comment)
+
+    class ReadonlyMeta:
+        readonly = ['final_price']
+
     def __str__(self):
         return self.product
     
