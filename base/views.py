@@ -104,21 +104,53 @@ class Product(FormMixin,DetailView):
         messages.add_message(self.request, messages.INFO, 'Product Reported Successfuly')
         return reverse('base:product', kwargs={'id': self.kwargs.get('id')})
     
+"""Cart Views"""
 class AddToCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('id')
+        user = self.request.user
         try:
-            cart = Cart.objects.get(id = product_id,user=request.user)
+            cart = Cart.objects.get(product_id = product_id,user = user)
             cart.quantity += 1
-            cart.save()
+            cart.save(update_fields=["quantity"])
+
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        
         except:
-            Cart.objects.create(
-                user=request.user,
-                product=TheProduct.objects.get(id = product_id),
-                quantity=1
-                )
+            cart_product_price = TheProduct.objects.get(id=product_id).final_price
+            Cart.objects.create(user = user, product_id = product_id,cart_product_price=cart_product_price)
+            
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    
+class IncreaseUpdateCartView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        id = self.kwargs.get('id')
+        user = self.request.user
+
+        cart = Cart.objects.get(user = user, id = id)
+        cart.quantity += 1
+        cart.save(update_fields=["quantity"])
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+class DecreaseUpdateCartView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        id = self.kwargs.get('id')
+        user = self.request.user
+
+        cart = Cart.objects.get(user = user, id = id)
+        cart.quantity -= 1
+        cart.save(update_fields=["quantity"])
+        
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+class UserCartDeleteView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        id=self.kwargs.get('id')
+        user=self.request.user
+
+        get_object_or_404(Cart,user = user,id = id).delete()
+        return redirect('base:cart')
     
 class UserCartView(LoginRequiredMixin,ListView):
     template_name = 'base/cart.html'
@@ -127,7 +159,6 @@ class UserCartView(LoginRequiredMixin,ListView):
     def get_queryset(self):
         global carts
         carts = Cart.objects.filter(user=self.request.user)
-        print(carts)
         return carts
     
     def get_context_data(self, **kwargs):
@@ -140,10 +171,7 @@ class UserCartView(LoginRequiredMixin,ListView):
         context['total'] = sum(product_price)
         return context
 
-class UserCartDeleteView(LoginRequiredMixin,View):
-    def get(self, request, *args, **kwargs):
-        get_object_or_404(Cart,id=self.kwargs.get('id'),user=self.request.user).delete()
-        return redirect('base:cart')
+"""End of Cart Views"""
     
 class NewArrivalsView(ListView):
     template_name = 'base/list_page.html'

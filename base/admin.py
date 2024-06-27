@@ -21,7 +21,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ordering = ['-status']
 
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('user','product','quantity','id')
+    list_display = ('user','product','cart_product_price','quantity','total_cart_price','id')
     list_filter = ('user','product','quantity')
     search_fields = ('user','product','id')
 

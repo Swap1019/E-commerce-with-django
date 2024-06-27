@@ -33,13 +33,22 @@
                         <div class="flex-shrink-0 ms-2">
                             <ul class="list-inline mb-0 font-size-16">
                                 <li class="list-inline-item">
+                                    <a href="{% url 'base:decrease_update_cart' cart.id %}" class="text-muted px-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                                            <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                                        </svg>
+                                    </a>
+                                </li>
+                                <li class="list-inline-item">
                                     <a href="{% url 'base:cart_delete' cart.id %}" class="text-muted px-1">
                                         <i class="mdi mdi-trash-can-outline"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item">
-                                    <a href="#" class="text-muted px-1">
-                                        <i class="mdi mdi-heart-outline"></i>
+                                    <a href="{% url 'base:increase_update_cart' cart.id %}" class="text-muted px-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                        </svg>
                                     </a>
                                 </li>
                             </ul>
@@ -50,7 +59,7 @@
                             <div class="col-md-4">
                                 <div class="mt-3">
                                     <p class="text-muted mb-2">Price</p>
-                                    <h5 class="mb-0 mt-2">{{ cart.product.price }}$</h5>
+                                    <h5 class="mb-0 mt-2">${{ cart.product.price }}</h5>
                                 </div>
                             </div>
                             <div class="col-md-5">
@@ -64,7 +73,7 @@
                             <div class="col-md-3">
                                 <div class="mt-3">
                                     <p class="text-muted mb-2">Total</p>
-                                    <h5>$</h5>
+                                    <h5>${{cart.total_cart_price}}</h5>
                                 </div>
                             </div>
                         </div>
