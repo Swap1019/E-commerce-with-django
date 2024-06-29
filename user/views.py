@@ -3,9 +3,19 @@ from django.db.models import Q
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+    )
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.forms import SetPasswordForm
 from .forms import (
     SignUpForm,
     UserProfileForm,
+    PasswordResetRequestForm,
     SellerRegisterForm,
     SellerRequestApproveForm,
     AddProductForm,
@@ -43,6 +53,23 @@ class UserLogout(LogoutView):
     
     def get_success_url(self):
         return reverse_lazy('base:home')
+    
+class CustomPasswordResetView(SuccessMessageMixin, PasswordResetView):
+    email_template_name = 'user/password_reset_email.html'
+    template_name = 'user/password_reset.html'
+    form_class = PasswordResetRequestForm
+    success_url = reverse_lazy("user:password_reset_done")
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'user/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'user/password_reset_confirm.html'
+    form_class = SetPasswordForm
+    success_url = reverse_lazy('user:password_reset_complete')
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'user/password_reset_complete.html'
     
 class SellerRegisterFormView(CreateView):
     form_class = SellerRegisterForm

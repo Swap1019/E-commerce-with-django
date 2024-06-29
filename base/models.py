@@ -67,9 +67,9 @@ class TheProduct(models.Model):
     )
     category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name="category")
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
-    price = models.DecimalField(max_digits=10, decimal_places=2,verbose_name="price",default=50)
-    discount_percentage = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],default=0)
-    final_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    price = models.DecimalField(max_digits=13, decimal_places=2,verbose_name="price",default=50)
+    discount_percentage = models.PositiveSmallIntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],default=0)
+    final_price = models.DecimalField(max_digits=13, decimal_places=2,null=True,blank=True)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
@@ -102,8 +102,8 @@ class TheProduct(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE)
-    cart_product_price = models.IntegerField(default=0)
-    quantity = models.IntegerField(default=1)
+    cart_product_price = models.IntegerField(default=1)
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)],default=1)
     total_cart_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
 
     class ReadonlyMeta:

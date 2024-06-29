@@ -105,22 +105,16 @@ class Product(FormMixin,DetailView):
         return reverse('base:product', kwargs={'id': self.kwargs.get('id')})
     
 """Cart Views"""
-class AddToCartView(LoginRequiredMixin,View):
+class AddToCartView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        product_id = kwargs.get('id')
         user = self.request.user
-        try:
-            cart = Cart.objects.get(product_id = product_id,user = user)
-            cart.quantity += 1
-            cart.save(update_fields=["quantity"])
-
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        product_id = kwargs.get('id')
         
-        except:
-            cart_product_price = TheProduct.objects.get(id=product_id).final_price
-            Cart.objects.create(user = user, product_id = product_id,cart_product_price=cart_product_price)
-            
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        cart_product_price = TheProduct.objects.get(id=product_id).final_price
+        Cart.objects.get_or_create(user = user, product_id = product_id,cart_product_price=cart_product_price)
+
+        
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
 class IncreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
@@ -165,10 +159,9 @@ class UserCartView(LoginRequiredMixin,ListView):
         context = super().get_context_data(**kwargs)
         product_ids = [product.product_id for product in carts]
         products = TheProduct.objects.filter(id__in=product_ids)
-        product_price = [product.final_price*cart.quantity for product,cart in zip(products,carts)]
+        totaL_carts_price = [cart.total_cart_price for cart in carts]
         context['product'] = products
-        context['prices'] = product_price
-        context['total'] = sum(product_price)
+        context['total'] = sum(totaL_carts_price)
         return context
 
 """End of Cart Views"""

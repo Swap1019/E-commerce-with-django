@@ -1,6 +1,14 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm,UserChangeForm
-from .models import User,UserSellerInfo,ReportedProduct
+from django.contrib.auth.forms import (
+    UserCreationForm,
+    UserChangeForm,
+    PasswordResetForm,
+    )
+from .models import (
+    User,
+    UserSellerInfo,
+    ReportedProduct,
+    )
 from base.models import TheProduct
 
 class SignUpForm(UserCreationForm):
@@ -45,6 +53,23 @@ class UserProfileForm(UserChangeForm):
         widgets = {
             'profile': forms.FileInput(attrs={'accept': 'image/*'}),  # Add accept attribute for image files
         }
+
+class PasswordResetRequestForm(PasswordResetForm):
+    email = forms.EmailField(label='Email')
+    username = forms.CharField(max_length=150, required=True, label='Username')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        username = cleaned_data.get('username')
+
+        if email and username:
+            try:
+                user = User.objects.get(email=email, username=username)
+            except User.DoesNotExist:
+                raise forms.ValidationError("There is no user registered with the specified email address and username.")
+        return cleaned_data
+
 
 class SellerRegisterForm(forms.ModelForm):
     #User SellerRegisterForm

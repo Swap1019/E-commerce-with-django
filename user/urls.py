@@ -1,11 +1,15 @@
 from django.urls import path
-
+from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from .views import (
     Register,
     UserLogin,
     UserLogout,
+    CustomPasswordResetView,
+    CustomPasswordResetDoneView,
+    CustomPasswordResetConfirmView,
+    CustomPasswordResetCompleteView,
     AccountView,
     SellerRegisterFormView,
     NewSellerRequests,
@@ -33,11 +37,14 @@ urlpatterns = [
     path('register/',Register.as_view(),name='register'),
     path('login/',UserLogin.as_view(),name='login'),
     path('logout/',UserLogout.as_view(),name='logout'),
+    path('password-reset/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password-reset-done/', CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password-reset-complete', CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('seller-register/',SellerRegisterFormView.as_view(),name='seller_register'),
     path('new-seller-requests/',NewSellerRequests.as_view(),name='new_seller_requests'),
     path('new-seller-requests/search/',NewSellerRequestsSearch.as_view(),name='new_seller_requests_search'),
     path('seller-request/<uuid:user_id>',SellerRequest.as_view(),name='seller_request_detail'),
-    #user interface urls
     path('profile/',AccountView.as_view(),name='profile'),
     path('shop/',ShopTotalView.as_view(),name='shop'),
     path('shop/mostviewed',ShopMostViewedProductsView.as_view(),name='shop_mostviewed'),
