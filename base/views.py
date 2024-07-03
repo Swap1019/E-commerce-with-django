@@ -27,7 +27,7 @@ class Home(ListView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user)
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
             context['quantity'] = context['cart'].count()
         return context
     
@@ -51,7 +51,8 @@ class HomeSearch(ListView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user)
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
+            context['quantity'] = context['cart'].count()
         return context
     
 class Product(FormMixin,DetailView):
@@ -79,7 +80,8 @@ class Product(FormMixin,DetailView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user)
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
+            context['quantity'] = context['cart'].count()
         return context
     
     def post(self, request, *args, **kwargs):
@@ -123,7 +125,7 @@ class IncreaseUpdateCartView(LoginRequiredMixin,View):
 
         cart = Cart.objects.get(user = user, id = id)
         cart.quantity += 1
-        cart.save(update_fields=["quantity"])
+        cart.save(update_fields=['quantity'])
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -134,7 +136,7 @@ class DecreaseUpdateCartView(LoginRequiredMixin,View):
 
         cart = Cart.objects.get(user = user, id = id)
         cart.quantity -= 1
-        cart.save(update_fields=["quantity"])
+        cart.save(update_fields=['quantity'])
         
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -152,7 +154,7 @@ class UserCartView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         global carts
-        carts = Cart.objects.filter(user=self.request.user)
+        carts = Cart.objects.filter(user=self.request.user,deleted=False)
         return carts
     
     def get_context_data(self, **kwargs):
@@ -179,6 +181,8 @@ class NewArrivalsView(ListView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
+            context['quantity'] = context['cart'].count()
         return context
     
 class MostViewedProducts(ListView):
@@ -197,6 +201,8 @@ class MostViewedProducts(ListView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
+            context['quantity'] = context['cart'].count()
         return context
     
 class MostRatedProducts(ListView):
@@ -213,4 +219,6 @@ class MostRatedProducts(ListView):
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
+            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
+            context['quantity'] = context['cart'].count()
         return context

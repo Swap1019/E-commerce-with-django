@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.html import mark_safe
+from django.utils import timezone
 from .limit import SingletonModel
 from datetime import datetime,timedelta
 from user.models import User
@@ -46,6 +47,8 @@ class TheProductManager(models.Manager):
             count=Count('hits')).order_by('-count')
         
 class TheProduct(models.Model):
+    #final_price is virtually generated
+    #discount_precentage has another check constraint for limiting it to 100 manually added in database
     product = models.CharField(max_length=50, verbose_name="product")
     period_choices = (
         ('1',"One_months"),
@@ -100,17 +103,34 @@ class TheProduct(models.Model):
 
 
 class Cart(models.Model):
+    #total_cart_price is virtually generated
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE)
     cart_product_price = models.IntegerField(default=1)
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)],default=1)
     total_cart_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    valid_until = models.DateTimeField()
+    deleted = models.BooleanField(default=False)
 
     class ReadonlyMeta:
         readonly = ['total_cart_price']
 
     def __str__(self):
         return f"{self.quantity}"
+    
+    def save(self, *args, **kwargs):
+        # Set valid_until to 2 hours from now if it's not already set
+        if not self.valid_until:
+            self.valid_until = timezone.now() + timedelta(hours=2)
+        super().save(*args, **kwargs)
+
+    def is_it_valid(self):
+        if self.valid_until > timezone.now():
+            return True
+        else:
+            self.deleted = True
+            self.save(update_fields=['deleted'])
+            return False
 
 class PagePic(SingletonModel):
     website_pic = models.ImageField(upload_to="images", verbose_name='website_pic')
