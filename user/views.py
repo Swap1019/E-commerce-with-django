@@ -1,5 +1,6 @@
 from typing import Any
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -23,9 +24,9 @@ from .forms import (
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
-from base.models import TheProduct
+from base.models import TheProduct,Cart
 from django.urls import reverse_lazy,reverse
-from django.views.generic import CreateView,ListView,UpdateView,DetailView,DeleteView
+from django.views.generic import CreateView,ListView,UpdateView,DeleteView
 from django.contrib.auth.views import LoginView,LogoutView
 
 
@@ -108,6 +109,26 @@ class AccountView(LoginRequiredMixin,UpdateView):
         kwargs = super(AccountView, self).get_form_kwargs(**kwargs)
         kwargs['user'] = self.request.user  # Pass 'user' directly to the form
         return kwargs
+    
+    
+class PurchasedProductsView(LoginRequiredMixin,ListView):
+    template_name = 'user/purchased_products.html'
+    context_object_name = 'carts'
+
+    def get_queryset(self):
+        global carts
+        carts = Cart.objects.filter(user=self.request.user)
+        return carts
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_ids = [product.product_id for product in carts]
+        products = TheProduct.objects.filter(id__in=product_ids)
+        totaL_carts_price = [cart.total_cart_price for cart in carts]
+        context['product'] = products
+        context['total'] = sum(totaL_carts_price)
+        return context
+
 
 #----------Admin and staff member interface----------
 
@@ -155,7 +176,7 @@ class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
 		})  
         return kwargs
     
-class NewProducts(SuperAndStaffAccessMixin,ListView):
+class NewProductsView(SuperAndStaffAccessMixin,ListView):
     template_name = 'user/new_products_added.html'
     context_object_name = 'newproducts'
 
@@ -163,7 +184,7 @@ class NewProducts(SuperAndStaffAccessMixin,ListView):
         return TheProduct.objects.filter(availability='I')
     
 
-class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
+class NewProductsSearchView(SuperAndStaffAccessMixin,ListView):
     '''modify the query'''
     model = TheProduct
     template_name = 'user/new_products_added.html'
@@ -177,7 +198,7 @@ class NewProductsSearch(SuperAndStaffAccessMixin,ListView):
             availability='I'
         )
 
-class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
+class NewProductApproveView(SuperAndStaffAccessMixin,UpdateView):
     '''Update the template'''
     template_name = 'user/new_product_added_approve.html'
     form_class = NewProductApproveForm
@@ -188,7 +209,7 @@ class NewProductApprove(SuperAndStaffAccessMixin,UpdateView):
         return TheProduct.objects.get(id = self.kwargs.get('id'))
     
     
-class ProductReports(SuperAndStaffAccessMixin,ListView):
+class ProductReportsView(SuperAndStaffAccessMixin,ListView):
     queryset = ReportedProduct.objects.filter(checked=False)
     template_name = 'user/reported_products_list.html'
     context_object_name = 'reported_products'
@@ -205,12 +226,20 @@ class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
         id = self.kwargs.get('id')
         reportedproduct = get_object_or_404(ReportedProduct,id=id)
         reportedproduct.checked = True
+        reportedproduct.save(update_fields=['checked'])
         return reportedproduct
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['product'] = TheProduct.objects.get(id=id)
         return context
+    
+    def form_valid(self, form):
+        reported_product = self.get_object()
+        the_product = reported_product.reported_product
+        the_product.availability = form.cleaned_data['availability']
+        the_product.save(update_fields=['availability'])
+        return super().form_valid(form)
 
 class ProductDeleteView(SuperAndStaffAccessMixin,DeleteView):
     model = TheProduct
@@ -264,7 +293,7 @@ class ShopUnavailableProductsView(SellerAccessMixin,ListView):
         #gets the unavailable products that were created by the user
         return TheProduct.objects.unavailables(created_by = self.request.user.user_id)
     
-class ShopSearch(SellerAccessMixin,ListView):
+class ShopSearchView(SellerAccessMixin,ListView):
     model = TheProduct
     template_name = 'user/shop.html'
     context_object_name = 'created_products'
@@ -276,7 +305,7 @@ class ShopSearch(SellerAccessMixin,ListView):
             Q(tags__name__icontains=query),
         ).order_by('-hits').distinct()
     
-class AddProduct(SellerAccessMixin,CreateView):
+class AddProductView(SellerAccessMixin,CreateView):
     form_class = AddProductForm
     template_name = 'user/add_product.html'
     success_url = reverse_lazy('user:shop')
@@ -286,3 +315,21 @@ class AddProduct(SellerAccessMixin,CreateView):
         form.instance.created_by = get_object_or_404(User,user_id = self.request.user.user_id)
         form.save()
         return super().form_valid(form)
+
+class ShippingProgressSellerView(SellerAccessMixin,ListView):
+    template_name = 'user/shipping_progress_seller.html'
+    context_object_name = 'carts'
+
+    def get_queryset(self):
+        global carts
+        carts = Cart.objects.filter(user=self.request.user)
+        return carts
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_ids = [product.product_id for product in carts]
+        products = TheProduct.objects.filter(id__in=product_ids)
+        totaL_carts_price = [cart.total_cart_price for cart in carts]
+        context['product'] = products
+        context['total'] = sum(totaL_carts_price)
+        return context

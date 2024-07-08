@@ -47,8 +47,8 @@ class TheProductManager(models.Manager):
             count=Count('hits')).order_by('-count')
         
 class TheProduct(models.Model):
-    #final_price is virtually generated
-    #discount_precentage has another check constraint for limiting it to 100 manually added in database
+    '''final_price is virtually generated'''
+    '''discount_precentage has another check constraint for limiting it to 100 manually added in database'''
     product = models.CharField(max_length=50, verbose_name="product")
     period_choices = (
         ('1',"One_months"),
@@ -92,7 +92,7 @@ class TheProduct(models.Model):
     
     def category_names(self):
         return ', '.join([a.title for a in self.category.all()])
-    category_names.short_description = "Admin Names"
+    category_names.short_description = 'Admin Names'
     
     def pic_sample_preview(self):
         return mark_safe(f'<img src = "{self.pic_sample.url}" width = "120" height="120" style="border-radius: 5px"/>')
@@ -104,13 +104,21 @@ class TheProduct(models.Model):
 
 class Cart(models.Model):
     #total_cart_price is virtually generated
+    progress_status_choices = (
+        ('0','Refuesed'),
+        ('25','In process'),
+        ('50','Preparation to ship'),
+        ('75','In shipping progress'),
+        ('100','Shipped'),
+        )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE)
     cart_product_price = models.IntegerField(default=1)
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)],default=1)
     total_cart_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     valid_until = models.DateTimeField()
-    deleted = models.BooleanField(default=False)
+    checkout = models.BooleanField(default=False)
+    progress_status = models.CharField(max_length=3,choices=progress_status_choices)
 
     class ReadonlyMeta:
         readonly = ['total_cart_price']
@@ -125,12 +133,13 @@ class Cart(models.Model):
         super().save(*args, **kwargs)
 
     def is_it_valid(self):
-        if self.valid_until > timezone.now():
+        if self.valid_until > timezone.now() or self.checkout == True:
             return True
         else:
-            self.deleted = True
-            self.save(update_fields=['deleted'])
-            return False
+            self.delete()
+
+class CartsShippingStatus(models.Model):
+    pass
 
 class PagePic(SingletonModel):
     website_pic = models.ImageField(upload_to="images", verbose_name='website_pic')

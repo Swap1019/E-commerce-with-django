@@ -11,8 +11,9 @@ from .models import TheProduct,PagePic,Cart
 from django.db.models import Q
 from user.models import User
 from user.forms import ReportProductForm
+from .mixins import PageDataMixin
 
-class Home(ListView):
+class HomeView(PageDataMixin,ListView):
     template_name = 'base/list_page.html'
     context_object_name = 'products'
     
@@ -20,18 +21,7 @@ class Home(ListView):
         #gets the most viewed products that were created by the user
         return TheProduct.objects.availables()
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add the background_pic to the context
-        context['background_pic'] = PagePic.objects.get().website_pic
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
-        return context
-    
-class HomeSearch(ListView):
+class HomeSearchView(PageDataMixin,ListView):
     model = TheProduct
     template_name = 'base/list_page.html'
     context_object_name = 'products'
@@ -44,18 +34,7 @@ class HomeSearch(ListView):
             availability='A'
         ).order_by('-hits').distinct()
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add the background_pic to the context
-        context['background_pic'] = PagePic.objects.get().website_pic
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
-        return context
-    
-class Product(FormMixin,DetailView):
+class ProductView(PageDataMixin,FormMixin,DetailView):
     template_name = 'base/view_product.html'
     context_object_name = 'product'
     model = TheProduct
@@ -70,18 +49,12 @@ class Product(FormMixin,DetailView):
 
     #returns the related product
     def get_context_data(self, *args, **kwargs):
-        context = super(Product, self).get_context_data(*args, **kwargs)
+        context = super(ProductView, self).get_context_data(*args, **kwargs)
         product = context['product']
         categories = product.category.all()  # Assuming a product can belong to multiple categories
         related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
         context['related_products'] = related_products
         context['form'] = ReportProductForm(initial={'post': self.object})
-
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
         return context
     
     def post(self, request, *args, **kwargs):
@@ -93,14 +66,13 @@ class Product(FormMixin,DetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        user_id = User.objects.get(pk = self.request.user.pk)
         product = TheProduct.objects.get(id = self.kwargs.get('id'))
         #insert user_id and product into form
-        form.instance.user = user_id
+        form.instance.user = User.objects.get(pk = self.request.user.pk)
         form.instance.reported_product = product
         form.instance.id = product.pk
         form.save()
-        return super(Product, self).form_valid(form)
+        return super(ProductView, self).form_valid(form)
     
     def get_success_url(self):
         messages.add_message(self.request, messages.INFO, 'Product Reported Successfuly')
@@ -109,21 +81,17 @@ class Product(FormMixin,DetailView):
 """Cart Views"""
 class AddToCartView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        user = self.request.user
-        product_id = kwargs.get('id')
         
-        cart_product_price = TheProduct.objects.get(id=product_id).final_price
-        Cart.objects.get_or_create(user = user, product_id = product_id,cart_product_price=cart_product_price)
+        cart_product_price = TheProduct.objects.get(id=kwargs.get('id')).final_price
+        Cart.objects.get_or_create(user = self.request.user, product_id = kwargs.get('id'),cart_product_price=cart_product_price)
 
         
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
 class IncreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
-        id = self.kwargs.get('id')
-        user = self.request.user
 
-        cart = Cart.objects.get(user = user, id = id)
+        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'))
         cart.quantity += 1
         cart.save(update_fields=['quantity'])
 
@@ -131,10 +99,8 @@ class IncreaseUpdateCartView(LoginRequiredMixin,View):
 
 class DecreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
-        id = self.kwargs.get('id')
-        user = self.request.user
 
-        cart = Cart.objects.get(user = user, id = id)
+        cart = Cart.objects.get(user = self.kwargs.get('id'), id = self.kwargs.get('id'))
         cart.quantity -= 1
         cart.save(update_fields=['quantity'])
         
@@ -142,11 +108,21 @@ class DecreaseUpdateCartView(LoginRequiredMixin,View):
 
 class UserCartDeleteView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
-        id=self.kwargs.get('id')
-        user=self.request.user
 
-        get_object_or_404(Cart,user = user,id = id).delete()
+        get_object_or_404(Cart,user = self.request.user,id = self.kwargs.get('id')).delete()
         return redirect('base:cart')
+    
+class UserCartCheckoutView(LoginRequiredMixin,View):
+
+    def get(self, request, *args, **kwargs):
+
+        carts = Cart.objects.filter(user = self.request.user)
+        for cart in carts:
+            cart.checkout = True
+        
+        Cart.objects.bulk_update(carts, ['checkout'])
+        
+        return HttpResponseRedirect(reverse('base:home'))
     
 class UserCartView(LoginRequiredMixin,ListView):
     template_name = 'base/cart.html'
@@ -154,7 +130,7 @@ class UserCartView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         global carts
-        carts = Cart.objects.filter(user=self.request.user,deleted=False)
+        carts = Cart.objects.filter(user=self.request.user)
         return carts
     
     def get_context_data(self, **kwargs):
@@ -168,57 +144,22 @@ class UserCartView(LoginRequiredMixin,ListView):
 
 """End of Cart Views"""
     
-class NewArrivalsView(ListView):
+class NewArrivalsView(PageDataMixin,ListView):
     template_name = 'base/list_page.html'
     context_object_name = 'products'
     queryset = TheProduct.objects.new_arrivals()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add the background_pic to the context
-        context['background_pic'] = PagePic.objects.get().website_pic
-
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
-        return context
     
-class MostViewedProducts(ListView):
+class MostViewedProducts(PageDataMixin,ListView):
     template_name = 'base/list_page.html'
     context_object_name = 'products'
 
     def get_queryset(self):
         #gets the most viewed products
         return TheProduct.objects.most_viewed_products()
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add the background_pic to the context
-        context['background_pic'] = PagePic.objects.get().website_pic
-
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
-        return context
     
-class MostRatedProducts(ListView):
+class MostRatedProducts(PageDataMixin,ListView):
     template_name = 'base/list_page.html'
     context_object_name = 'products'
 
     def get_queryset(self):
         return TheProduct.objects.most_rated_products()
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add the background_pic to the context
-        context['background_pic'] = PagePic.objects.get().website_pic
-        if self.request.user.is_authenticated:
-            context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
-            context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user,deleted=False)
-            context['quantity'] = context['cart'].count()
-        return context

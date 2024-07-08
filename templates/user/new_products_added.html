@@ -34,7 +34,7 @@
                 <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'user:new_products_approve' newproduct.id %}">View</a></div>
               </div>
               <div class="card-footer">
-                <small class="text-muted">Last updated 3 mins ago</small>
+                <small class="text-muted">Creation Date:{{newproduct.imported_at}}</small>
               </div>
             </div>
             {% endfor %}

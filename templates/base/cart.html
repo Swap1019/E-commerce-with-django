@@ -128,12 +128,12 @@
     
     <div class="row my-4">
         <div class="col-sm-6">
-            <a href="ecommerce-products.html" class="btn btn-link text-muted">
+            <a href="{% url 'base:home' %}" class="btn btn-link text-muted">
                 <i class="mdi mdi-arrow-left me-1"></i> Continue Shopping </a>
         </div> 
         <div class="col-sm-6">
             <div class="text-sm-end mt-2 mt-sm-0">
-                <a href="ecommerce-checkout.html" class="btn btn-success">
+                <a href="{% url 'base:cart_checkout' %}" class="btn btn-success">
                     <i class="mdi mdi-cart-outline me-1"></i> Checkout </a>
             </div>
         </div> 
