@@ -105,7 +105,7 @@ class TheProduct(models.Model):
 class Cart(models.Model):
     #total_cart_price is virtually generated
     progress_status_choices = (
-        ('0','Refuesed'),
+        ('00','Refuesed'),
         ('25','In process'),
         ('50','Preparation to ship'),
         ('75','In shipping progress'),
@@ -137,9 +137,6 @@ class Cart(models.Model):
             return True
         else:
             self.delete()
-
-class CartsShippingStatus(models.Model):
-    pass
 
 class PagePic(SingletonModel):
     website_pic = models.ImageField(upload_to="images", verbose_name='website_pic')

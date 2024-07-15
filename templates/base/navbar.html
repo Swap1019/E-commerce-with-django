@@ -22,12 +22,13 @@
                     {% endif %}
                 </span>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                  {% if user.is_seller == 'A' %}
-                    <li><a class="dropdown-item" href="{% url 'user:shop' %}">Your Shop</a></li>
-                  {% endif %}
                   <li><a class="dropdown-item" href="{% url 'user:profile' %}">Profile</a></li>
                   <li><a class="dropdown-item" href="{% url 'user:purchased_products' %}">Purchased Products</a></li>
-                  <li><a class="dropdown-item" href="{% url 'user:seller_register' %}">Register As Seller</a></li>
+                  {% if user.is_seller == 'A' %}
+                    <li><a class="dropdown-item" href="{% url 'user:shop' %}">Your Shop</a></li>
+                  {% else %}
+                    <li><a class="dropdown-item" href="{% url 'user:seller_register' %}">Register As Seller</a></li>
+                  {% endif %}
                 </ul>
             </div>
             <!--User's cart-->

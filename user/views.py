@@ -26,7 +26,7 @@ from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
 from base.models import TheProduct,Cart
 from django.urls import reverse_lazy,reverse
-from django.views.generic import CreateView,ListView,UpdateView,DeleteView
+from django.views.generic import CreateView,ListView,UpdateView,DeleteView,View
 from django.contrib.auth.views import LoginView,LogoutView
 
 
@@ -128,7 +128,6 @@ class PurchasedProductsView(LoginRequiredMixin,ListView):
         context['product'] = products
         context['total'] = sum(totaL_carts_price)
         return context
-
 
 #----------Admin and staff member interface----------
 
@@ -322,7 +321,7 @@ class ShippingProgressSellerView(SellerAccessMixin,ListView):
 
     def get_queryset(self):
         global carts
-        carts = Cart.objects.filter(user=self.request.user)
+        carts = Cart.objects.filter(product__created_by=self.request.user)
         return carts
     
     def get_context_data(self, **kwargs):
@@ -333,3 +332,14 @@ class ShippingProgressSellerView(SellerAccessMixin,ListView):
         context['product'] = products
         context['total'] = sum(totaL_carts_price)
         return context
+    
+class ShippingStatusUpdateView(LoginRequiredMixin,View):
+
+    def get(self, request, *args, **kwargs):
+
+        cart = Cart.objects.get(id=self.kwargs.get('id'),product__created_by=self.request.user)
+        
+        cart.progress_status = self.kwargs.get('value')
+        cart.save(update_fields=['progress_status'])
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
