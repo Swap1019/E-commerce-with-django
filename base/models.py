@@ -78,6 +78,8 @@ class TheProduct(models.Model):
     period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
     max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
     imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
+    quantity = models.PositiveIntegerField(default=5)
+    sold_quantity = models.PositiveIntegerField(default=0)
     availability = models.CharField(max_length=1,choices=status,default='I',verbose_name='Status')
     hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
     tags = TaggableManager()
@@ -97,6 +99,14 @@ class TheProduct(models.Model):
     def pic_sample_preview(self):
         return mark_safe(f'<img src = "{self.pic_sample.url}" width = "120" height="120" style="border-radius: 5px"/>')
     pic_sample_preview.short_description = 'thumbnail'
+
+    def save(self,*args,**kwargs):
+        self.quantity_check()
+        super().save(*args,**kwargs)
+
+    def quantity_check(self):
+        if self.quantity <= 0:
+            self.availability = 'U'
 
 
     objects = TheProductManager()

@@ -121,3 +121,8 @@ class ReportProductForm(forms.ModelForm):
         model = ReportedProduct
         fields = '__all__'
         exclude = ['id','reported_product','user','checked']
+
+class ProductUpdateForm(forms.ModelForm):
+    class Meta:
+        model = TheProduct
+        fields = '__all__'

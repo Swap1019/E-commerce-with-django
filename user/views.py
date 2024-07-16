@@ -21,6 +21,7 @@ from .forms import (
     SellerRequestApproveForm,
     AddProductForm,
     NewProductApproveForm,
+    ProductUpdateForm,
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
@@ -314,6 +315,20 @@ class AddProductView(SellerAccessMixin,CreateView):
         form.instance.created_by = get_object_or_404(User,user_id = self.request.user.user_id)
         form.save()
         return super().form_valid(form)
+    
+class ProductStats(SellerAccessMixin,UpdateView):
+    model = TheProduct
+    form_class = ProductUpdateForm
+    template_name = 'user/product_stats.html'
+
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(**kwargs)
+        product = get_object_or_404(TheProduct,pk = self.kwargs.get('pk'),created_by = self.request.user)
+        context['product'] = product
+        context['earnings'] = product.sold_quantity * product.price
+
+        return context
+
 
 class ShippingProgressSellerView(SellerAccessMixin,ListView):
     template_name = 'user/shipping_progress_seller.html'

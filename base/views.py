@@ -83,7 +83,7 @@ class AddToCartView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         
         cart_product_price = TheProduct.objects.get(id=kwargs.get('id')).final_price
-        Cart.objects.get_or_create(user = self.request.user, product_id = kwargs.get('id'),cart_product_price=cart_product_price)
+        Cart.objects.get_or_create(user = self.request.user, product_id = kwargs.get('id'),cart_product_price=cart_product_price,checkout = False)
 
         
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
@@ -91,7 +91,7 @@ class AddToCartView(LoginRequiredMixin, View):
 class IncreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
 
-        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'))
+        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
         cart.quantity += 1
         cart.save(update_fields=['quantity'])
 
@@ -100,7 +100,7 @@ class IncreaseUpdateCartView(LoginRequiredMixin,View):
 class DecreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
 
-        cart = Cart.objects.get(user = self.kwargs.get('id'), id = self.kwargs.get('id'))
+        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
         cart.quantity -= 1
         cart.save(update_fields=['quantity'])
         
@@ -109,18 +109,24 @@ class DecreaseUpdateCartView(LoginRequiredMixin,View):
 class UserCartDeleteView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
 
-        get_object_or_404(Cart,user = self.request.user,id = self.kwargs.get('id')).delete()
+        get_object_or_404(Cart,user = self.request.user,id = self.kwargs.get('id'),checkout = False).delete()
         return redirect('base:cart')
     
 class UserCartCheckoutView(LoginRequiredMixin,View):
 
     def get(self, request, *args, **kwargs):
+        carts = Cart.objects.filter(user = self.request.user,checkout=False)
+        product_ids = carts.values_list('product_id', flat=True)
+        products = TheProduct.objects.filter(id__in = product_ids)
 
-        carts = Cart.objects.filter(user = self.request.user)
-        for cart in carts:
+        for product,cart in zip(products,carts):
             cart.checkout = True
+            product.quantity -= cart.quantity
+            product.sold_quantity += cart.quantity
+            product.quantity_check()
         
         Cart.objects.bulk_update(carts, ['checkout'])
+        TheProduct.objects.bulk_update(products, ['sold_quantity','quantity','availability'])
         
         return HttpResponseRedirect(reverse('base:home'))
     
@@ -130,7 +136,7 @@ class UserCartView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         global carts
-        carts = Cart.objects.filter(user=self.request.user)
+        carts = Cart.objects.filter(user=self.request.user,checkout = False)
         return carts
     
     def get_context_data(self, **kwargs):

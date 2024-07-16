@@ -11,6 +11,6 @@ class PageDataMixin:
         if self.request.user.is_authenticated:
             context['user_profile'] = User.objects.get(pk=self.request.user.pk).profile
             context['username'] = User.objects.get(pk=self.request.user.pk).username
-            context['cart'] = Cart.objects.filter(user=self.request.user)
+            context['cart'] = Cart.objects.filter(user=self.request.user,checkout=False)
             context['quantity'] = context['cart'].count()
         return context
