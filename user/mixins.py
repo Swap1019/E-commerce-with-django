@@ -1,7 +1,6 @@
 from django.http import Http404,HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404,redirect
-
 #Access mixins
 class SuperAndStaffAccessMixin():
     def dispatch(self, request, *args, **kwargs):

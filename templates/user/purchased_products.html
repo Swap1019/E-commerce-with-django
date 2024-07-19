@@ -29,10 +29,42 @@
     <!-- /.container-fluid -->
 
     <div class="container">
+        <div class="position-relative">
+            <div class="col-xl-4 position-absolute end-0">
+                <div class="mt-5 mt-lg-0">
+                    <div class="card border shadow-none">
+                        <div class="card-header bg-transparent border-bottom py-3 px-4">
+                            <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#MN0124</span></h5>
+                        </div>
+                        <div class="card-body p-4 pt-2">
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+                                    <tbody>
+                                    <tr>
+                                        <td>Sub Total :</td>
+                                        <td class="text-end">$ {{ total }}</td>
+                                    </tr>
+                                    <tr class="bg-light">
+                                        <th>Total :</th>
+                                        <td class="text-end">
+                                            <span class="fw-bold">
+                                                $ {{ total }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
+            {% for cart in carts %}
             <div class="col-xl-8">
                 <div class="card border shadow-none">
-                {% for cart in carts %}
+                
                     <div class="card-body">
                         <div class="container">
                             <div class="row">
@@ -110,39 +142,11 @@
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                
                 </div>
                 <!-- Add the same structure for other product cards -->
             </div>
-            <div class="col-xl-4">
-                <div class="mt-5 mt-lg-0">
-                    <div class="card border shadow-none">
-                        <div class="card-header bg-transparent border-bottom py-3 px-4">
-                            <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#MN0124</span></h5>
-                        </div>
-                        <div class="card-body p-4 pt-2">
-                            <div class="table-responsive">
-                                <table class="table mb-0">
-                                    <tbody>
-                                    <tr>
-                                        <td>Sub Total :</td>
-                                        <td class="text-end">$ {{ total }}</td>
-                                    </tr>
-                                    <tr class="bg-light">
-                                        <th>Total :</th>
-                                        <td class="text-end">
-                                            <span class="fw-bold">
-                                                $ {{ total }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     
         <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>

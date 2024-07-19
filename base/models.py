@@ -122,13 +122,13 @@ class Cart(models.Model):
         ('100','Shipped'),
         )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE)
+    product = models.ForeignKey(TheProduct,to_field='id',on_delete=models.CASCADE,related_name='carts')
     cart_product_price = models.IntegerField(default=1)
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)],default=1)
     total_cart_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     valid_until = models.DateTimeField()
     checkout = models.BooleanField(default=False)
-    progress_status = models.CharField(max_length=3,choices=progress_status_choices)
+    progress_status = models.CharField(default='25',max_length=3,choices=progress_status_choices)
 
     class ReadonlyMeta:
         readonly = ['total_cart_price']

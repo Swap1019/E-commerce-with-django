@@ -7,8 +7,8 @@ from django.contrib import messages
 from django.views.generic import ListView,DetailView,View,DeleteView
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import TheProduct,PagePic,Cart
-from django.db.models import Q
+from .models import TheProduct,PagePic,Cart,ProductHit
+from django.db.models import Q,Count
 from user.models import User
 from user.forms import ReportProductForm
 from .mixins import PageDataMixin
@@ -41,6 +41,7 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
     form_class = ReportProductForm
     #gets the specified product
     def get_object(self):
+        global product
         product = get_object_or_404(TheProduct,id=self.kwargs.get('id'))
         ip_address = self.request.user.ip_address
         if ip_address not in product.hits.all():
@@ -50,11 +51,11 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
     #returns the related product
     def get_context_data(self, *args, **kwargs):
         context = super(ProductView, self).get_context_data(*args, **kwargs)
-        product = context['product']
         categories = product.category.all()  # Assuming a product can belong to multiple categories
         related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
         context['related_products'] = related_products
         context['form'] = ReportProductForm(initial={'post': self.object})
+        context['views'] = ProductHit.objects.filter(product=product).annotate(hit_count=Count('product')).order_by('-hit_count').count()
         return context
     
     def post(self, request, *args, **kwargs):

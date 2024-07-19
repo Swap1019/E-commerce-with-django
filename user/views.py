@@ -1,6 +1,6 @@
 from typing import Any
-from django.db.models import Q
-from django.db.models.query import QuerySet
+from django.db.models import Q,Count
+from django.db.models.functions import TruncMonth
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -25,14 +25,21 @@ from .forms import (
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
-from base.models import TheProduct,Cart
+from base.models import TheProduct,Cart,ProductHit
 from django.urls import reverse_lazy,reverse
-from django.views.generic import CreateView,ListView,UpdateView,DeleteView,View
+from django.views.generic import (
+    CreateView,
+    ListView,
+    DetailView,
+    UpdateView,
+    DeleteView,
+    View,
+    )
 from django.contrib.auth.views import LoginView,LogoutView
 
 
 #----------Authentication------------
-class Register(CreateView):
+class RegisterView(CreateView):
     form_class = SignUpForm
     template_name = 'user/register.html'
 
@@ -43,14 +50,14 @@ class Register(CreateView):
         return HttpResponseRedirect(reverse('user:login'))
 
 
-class UserLogin(LoginView):
+class UserLoginView(LoginView):
     template_name = 'user/login.html'
     fields = '__all__'
     redirect_authenticated_user = True
     def get_success_url(self):
         return reverse_lazy('base:home')
     
-class UserLogout(LogoutView):
+class UserLogoutView(LogoutView):
     template_name = 'user/list_page.html'
     
     def get_success_url(self):
@@ -132,12 +139,12 @@ class PurchasedProductsView(LoginRequiredMixin,ListView):
 
 #----------Admin and staff member interface----------
 
-class NewSellerRequests(SuperAndStaffAccessMixin,ListView):
+class NewSellerRequestsView(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
     template_name = 'user/new_seller_requests.html'
     context_object_name = 'Seller_informations'
 
-class NewSellerRequestsSearch(SuperAndStaffAccessMixin,ListView):
+class NewSellerRequestsSearchView(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
     template_name = 'user/new_seller_requests.html'
     context_object_name = 'Seller_informations'
@@ -149,7 +156,7 @@ class NewSellerRequestsSearch(SuperAndStaffAccessMixin,ListView):
             Q(national_code__icontains=query),
         )
 
-class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
+class SellerRequestView(SuperAndStaffAccessMixin,UpdateView):
     #Request approve view
     form_class = SellerRequestApproveForm
     template_name = 'user/seller_request_approve.html'
@@ -170,7 +177,7 @@ class SellerRequest(SuperAndStaffAccessMixin,UpdateView):
     
     def get_form_kwargs(self):
         #updates the user data
-        kwargs = super(SellerRequest,self).get_form_kwargs()
+        kwargs = super(SellerRequestView,self).get_form_kwargs()
         kwargs.update({
 			'user': self.request.user
 		})  
@@ -316,18 +323,34 @@ class AddProductView(SellerAccessMixin,CreateView):
         form.save()
         return super().form_valid(form)
     
-class ProductStats(SellerAccessMixin,UpdateView):
+class ProductStatsView(SellerAccessMixin,DetailView):
     model = TheProduct
-    form_class = ProductUpdateForm
     template_name = 'user/product_stats.html'
 
     def get_context_data(self,*args,**kwargs):
         context = super().get_context_data(**kwargs)
         product = get_object_or_404(TheProduct,pk = self.kwargs.get('pk'),created_by = self.request.user)
-        context['product'] = product
-        context['earnings'] = product.sold_quantity * product.price
+        carts = product.carts.filter(product=product)
+        hits = ProductHit.objects.filter(product=product).annotate(month=TruncMonth('created')).order_by('month', 'created')
 
+        monthly_hits = ProductHit.objects.filter(product=product) \
+            .annotate(month=TruncMonth('created')) \
+            .values('month') \
+            .annotate(hit_count=Count('id')) \
+            .order_by('month')
+
+        context['product'] = product
+        context['views'] = [{"y": hit['hit_count'], "label": hit['month'].strftime('%B %Y')} for hit in monthly_hits]
+        context['pending_orders'] = carts.exclude(progress_status = '100' or '00').count()
+        context['shipped_orders'] = carts.filter(progress_status = '100').count()
+        context['cancelled'] = carts.filter(progress_status = '00').count()
+        context['earnings'] = product.sold_quantity * product.price
         return context
+    
+class ProductUpdateView(SellerAccessMixin,UpdateView):
+    model = TheProduct
+    template_name = 'user/product_update.html'
+    """!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
 
 
 class ShippingProgressSellerView(SellerAccessMixin,ListView):
@@ -348,7 +371,7 @@ class ShippingProgressSellerView(SellerAccessMixin,ListView):
         context['total'] = sum(totaL_carts_price)
         return context
     
-class ShippingStatusUpdateView(LoginRequiredMixin,View):
+class ShippingStatusUpdateView(SellerAccessMixin,View):
 
     def get(self, request, *args, **kwargs):
 
