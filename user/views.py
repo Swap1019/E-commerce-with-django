@@ -1,5 +1,5 @@
 from typing import Any
-from django.db.models import Q,Count
+from django.db.models import Q,Count,Sum
 from django.db.models.functions import TruncMonth
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -221,6 +221,11 @@ class ProductReportsView(SuperAndStaffAccessMixin,ListView):
     template_name = 'user/reported_products_list.html'
     context_object_name = 'reported_products'
 
+class CheckedProductReportsView(SuperAndStaffAccessMixin,ListView):
+    queryset = ReportedProduct.objects.filter(checked=True)
+    template_name = 'user/reported_products_list.html'
+    context_object_name = 'reported_products'
+
 class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
     model = TheProduct
     fields = ['availability']
@@ -253,9 +258,6 @@ class ProductDeleteView(SuperAndStaffAccessMixin,DeleteView):
     template_name = 'user/product_delete.html'
     context_object_name = 'product'
     success_url = reverse_lazy('user:product_reports')
-
-    def get_object(self):
-        return get_object_or_404(TheProduct,id=self.kwargs.get('id'))
     
 #---------Seller interface -----------
 
@@ -331,7 +333,6 @@ class ProductStatsView(SellerAccessMixin,DetailView):
         context = super().get_context_data(**kwargs)
         product = get_object_or_404(TheProduct,pk = self.kwargs.get('pk'),created_by = self.request.user)
         carts = product.carts.filter(product=product)
-        hits = ProductHit.objects.filter(product=product).annotate(month=TruncMonth('created')).order_by('month', 'created')
 
         monthly_hits = ProductHit.objects.filter(product=product) \
             .annotate(month=TruncMonth('created')) \
@@ -344,13 +345,18 @@ class ProductStatsView(SellerAccessMixin,DetailView):
         context['pending_orders'] = carts.exclude(progress_status = '100' or '00').count()
         context['shipped_orders'] = carts.filter(progress_status = '100').count()
         context['cancelled'] = carts.filter(progress_status = '00').count()
-        context['earnings'] = product.sold_quantity * product.price
+        context['earnings'] = carts.aggregate(earnings = Sum('total_cart_price')).get('earnings')
         return context
     
 class ProductUpdateView(SellerAccessMixin,UpdateView):
     model = TheProduct
+    form_class = ProductUpdateForm
     template_name = 'user/product_update.html'
-    """!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+
+    def get_success_url(self):
+        return reverse_lazy('user:shop')
+
+
 
 
 class ShippingProgressSellerView(SellerAccessMixin,ListView):

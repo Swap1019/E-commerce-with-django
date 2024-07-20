@@ -46,7 +46,7 @@
     
                 <!-- Nav Item - Dashboard -->
                 <li class="nav-item active">
-                    <a class="nav-link" href="account.html">
+                    <a class="nav-link" href="{% url 'user:shop' %}">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span></a>
                 </li>
@@ -133,6 +133,10 @@
                                 <a class="collapse-item" href="{% url 'user:product_reports' %}">
                                     <i class="fas fa-info-circle mr-1"></i>
                                     Reported Products
+                                </a>
+                                <a class="collapse-item" href="{% url 'user:checked_product_reports' %}">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Checked Reports
                                 </a>
                         </div>
                     </div>

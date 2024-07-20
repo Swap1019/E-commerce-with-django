@@ -37,7 +37,7 @@ class ReportedProduct(models.Model):
         ('3',"Scam"),
     )
     reported_product = models.ForeignKey('base.TheProduct',on_delete=models.CASCADE)
-    id = models.CharField(max_length = 12,primary_key=True)
+    id = models.IntegerField(primary_key=True)
     user = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE)
     reason = models.CharField(max_length=1,choices=reasons)
     explanation = models.TextField()

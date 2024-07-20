@@ -1,1 +1,31 @@
-Hi
+{% extends 'user/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Update Product</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <li class="list-group-item">{{ form.product|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.category|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.price|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.discount_percentage|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.pic_sample|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.description|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.quantity|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.availability|as_crispy_field }}</li>
+                        <button type="submit" class="btn btn-success mt-3">Update Product</button>
+                        <a href="{% url 'user:shop' %}" class="btn btn-danger mt-3">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -31,6 +31,7 @@ from .views import (
     NewProductsSearchView,
     NewProductApproveView,
     ProductReportsView,
+    CheckedProductReportsView,
     ReportedProductView,
     ProductDeleteView,
     )
@@ -60,14 +61,15 @@ urlpatterns = [
     path('shop/search/',ShopSearchView.as_view(),name='shop_search'),
     path('shop/addproduct',AddProductView.as_view(),name='add_product'),
     path('shop/product-stats/<int:pk>',ProductStatsView.as_view(),name='product_stats'),
-    path('shop/product-stats/<int:pk>',ProductUpdateView.as_view(),name='product_stats'),
+    path('shop/product-update/<int:pk>',ProductUpdateView.as_view(),name='product_update'),
     path('shop/shipping-progress-seller',ShippingProgressSellerView.as_view(),name='shipping_progress_seller'),
     path('shop/shipping-progress-seller/update/<int:id>/<str:value>',ShippingStatusUpdateView.as_view(),name='shipping-status-update-view'),
     path('newproducts/',NewProductsView.as_view(),name='new_products'),
     path('newproducts/search/',NewProductsSearchView.as_view(),name='new_products_search'),
     path('newproducts/product/<int:id>',NewProductApproveView.as_view(),name='new_products_approve'),
     path('reportedproducts/',ProductReportsView.as_view(),name='product_reports'),
+    path('reportedproducts/checked',CheckedProductReportsView.as_view(),name='checked_product_reports'),
     path('reportedproducts/reportedproduct/<int:id>',ReportedProductView.as_view(),name='reported_product_view'),
-    path('reportedproducts/reportedproduct/<int:id>/delete/',ProductDeleteView.as_view(),name='product_delete_view'),
+    path('product/<int:pk>/delete/',ProductDeleteView.as_view(),name='product_delete_view'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

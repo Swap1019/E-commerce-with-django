@@ -125,4 +125,19 @@ class ReportProductForm(forms.ModelForm):
 class ProductUpdateForm(forms.ModelForm):
     class Meta:
         model = TheProduct
-        fields = '__all__'
+        fields = ['product','category','price','discount_percentage','pic_sample','description','quantity','availability']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ProductUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['availability'].choices = (
+            ('A','Available'),
+            ('U','Unavailable'),
+            )
+        self.fields['product'].disabled = True
+        if self.instance.availability in ['B', 'I']:
+            self.fields['availability'].disabled = True
+
+    def clean_availability(self):
+        availability = self.cleaned_data.get('availability')
+        return availability
