@@ -35,6 +35,7 @@ from django.views.generic import (
     DeleteView,
     View,
     )
+from .base_views import BaseProductReportsView,BaseShopView
 from django.contrib.auth.views import LoginView,LogoutView
 
 
@@ -216,15 +217,11 @@ class NewProductApproveView(SuperAndStaffAccessMixin,UpdateView):
         return TheProduct.objects.get(id = self.kwargs.get('id'))
     
     
-class ProductReportsView(SuperAndStaffAccessMixin,ListView):
+class ProductReportsView(SuperAndStaffAccessMixin,BaseProductReportsView):
     queryset = ReportedProduct.objects.filter(checked=False)
-    template_name = 'user/reported_products_list.html'
-    context_object_name = 'reported_products'
 
-class CheckedProductReportsView(SuperAndStaffAccessMixin,ListView):
+class CheckedProductReportsView(SuperAndStaffAccessMixin,BaseProductReportsView):
     queryset = ReportedProduct.objects.filter(checked=True)
-    template_name = 'user/reported_products_list.html'
-    context_object_name = 'reported_products'
 
 class ReportedProductView(SuperAndStaffAccessMixin,UpdateView):
     model = TheProduct
@@ -261,51 +258,38 @@ class ProductDeleteView(SuperAndStaffAccessMixin,DeleteView):
     
 #---------Seller interface -----------
 
-class ShopTotalView(SellerAccessMixin,ListView):
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopTotalView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the products that were created by the user
         return TheProduct.objects.filter(created_by = self.request.user.user_id)
 
 
-class ShopMostViewedProductsView(SellerAccessMixin,ListView):
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopMostViewedProductsView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the most viewed products that were created by the user
         return TheProduct.objects.most_viewed_products(created_by = self.request.user.user_id)
 
-class ShopMostRatedProductsView(SellerAccessMixin,ListView):
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopMostRatedProductsView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the most rated products that were created by the user
         return TheProduct.objects.most_rated_products(created_by = self.request.user.user_id)
 
-class ShopNewArrivalProductsView(SellerAccessMixin,ListView):
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopNewArrivalProductsView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the new arrival products that were created by the user
         return TheProduct.objects.new_arrivals(created_by = self.request.user.user_id)
 
-class ShopUnavailableProductsView(SellerAccessMixin,ListView):
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopUnavailableProductsView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the unavailable products that were created by the user
         return TheProduct.objects.unavailables(created_by = self.request.user.user_id)
     
-class ShopSearchView(SellerAccessMixin,ListView):
-    model = TheProduct
-    template_name = 'user/shop.html'
-    context_object_name = 'created_products'
+class ShopSearchView(SellerAccessMixin,BaseShopView):
 
     def get_queryset(self):
         query = self.request.GET.get('SearchQuery')

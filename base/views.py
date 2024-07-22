@@ -4,27 +4,23 @@ from django.shortcuts import get_object_or_404,redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.views.generic import ListView,DetailView,View,DeleteView
+from django.views.generic import ListView,DetailView,View
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import TheProduct,PagePic,Cart,ProductHit
+from .models import TheProduct,Cart,ProductHit
 from django.db.models import Q,Count
 from user.models import User
 from user.forms import ReportProductForm
 from .mixins import PageDataMixin
+from .base_views import BaseShopView
 
-class HomeView(PageDataMixin,ListView):
-    template_name = 'base/list_page.html'
-    context_object_name = 'products'
+class HomeView(PageDataMixin,BaseShopView):
     
     def get_queryset(self):
         #gets the most viewed products that were created by the user
         return TheProduct.objects.availables()
     
-class HomeSearchView(PageDataMixin,ListView):
-    model = TheProduct
-    template_name = 'base/list_page.html'
-    context_object_name = 'products'
+class HomeSearchView(PageDataMixin,BaseShopView):
 
     def get_queryset(self):
         query = self.request.GET.get('SearchQuery')
@@ -42,7 +38,7 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
     #gets the specified product
     def get_object(self):
         global product
-        product = get_object_or_404(TheProduct,id=self.kwargs.get('id'))
+        product = get_object_or_404(TheProduct,id=self.kwargs.get('id'),availability='A')
         ip_address = self.request.user.ip_address
         if ip_address not in product.hits.all():
             product.hits.add(ip_address)
@@ -52,8 +48,7 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProductView, self).get_context_data(*args, **kwargs)
         categories = product.category.all()  # Assuming a product can belong to multiple categories
-        related_products = TheProduct.objects.filter(category__in=categories).exclude(id=product.id)
-        context['related_products'] = related_products
+        context['related_products'] = TheProduct.objects.filter(category__in=categories,availability='A').exclude(id=product.id)
         context['form'] = ReportProductForm(initial={'post': self.object})
         context['views'] = ProductHit.objects.filter(product=product).annotate(hit_count=Count('product')).order_by('-hit_count').count()
         return context
@@ -83,7 +78,7 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
 class AddToCartView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         
-        cart_product_price = TheProduct.objects.get(id=kwargs.get('id')).final_price
+        cart_product_price = TheProduct.objects.get(id=kwargs.get('id'),availability='A').final_price
         Cart.objects.get_or_create(user = self.request.user, product_id = kwargs.get('id'),cart_product_price=cart_product_price,checkout = False)
 
         
@@ -151,22 +146,18 @@ class UserCartView(LoginRequiredMixin,ListView):
 
 """End of Cart Views"""
     
-class NewArrivalsView(PageDataMixin,ListView):
-    template_name = 'base/list_page.html'
-    context_object_name = 'products'
-    queryset = TheProduct.objects.new_arrivals()
+class NewArrivalsView(PageDataMixin,BaseShopView):
+
+    def get_queryset(self):
+        return TheProduct.objects.new_arrivals()
     
-class MostViewedProducts(PageDataMixin,ListView):
-    template_name = 'base/list_page.html'
-    context_object_name = 'products'
+class MostViewedProducts(PageDataMixin,BaseShopView):
 
     def get_queryset(self):
         #gets the most viewed products
         return TheProduct.objects.most_viewed_products()
     
-class MostRatedProducts(PageDataMixin,ListView):
-    template_name = 'base/list_page.html'
-    context_object_name = 'products'
+class MostRatedProducts(PageDataMixin,BaseShopView):
 
     def get_queryset(self):
         return TheProduct.objects.most_rated_products()

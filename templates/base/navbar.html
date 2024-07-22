@@ -16,7 +16,7 @@
             <div class="dropdown profile-container">
                 <span class="dropdown-toggle mr-2 d-none d-lg-inline text-gray-600 small" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">{{ username }}
                     {% if user_profile %}
-                        <img src="{{ user_profile.url }}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                        <img src="{{ user.profile.url }}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
                     {% else %}
                         <img src="{% static 'user/img/noun-user-avatar-2540366.svg' %}" alt="Avatar" class="avatar" style="width: 50px; height: 50px; border-radius: 50%;">
                     {% endif %}

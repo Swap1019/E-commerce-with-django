@@ -104,7 +104,7 @@ class NewProductApproveForm(forms.ModelForm):
 
     class Meta:
         model = TheProduct
-        fields = ['pic_sample','product','created_by','category','price','discount_percentage','description','period','max_users','availability']
+        fields = ['pic_sample','product','created_by','category','price','discount_percentage','description','availability']
 
 class AddProductForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
@@ -113,7 +113,7 @@ class AddProductForm(forms.ModelForm):
 
     class Meta:
         model = TheProduct
-        fields = ['product','category','price','discount_percentage','pic_sample','description','period','max_users','availability']
+        fields = ['product','category','price','discount_percentage','pic_sample','description','availability']
 
 
 class ReportProductForm(forms.ModelForm):

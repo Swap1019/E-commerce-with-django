@@ -37,7 +37,7 @@ class TheProductManager(models.Manager):
     def new_arrivals(self,**kwargs):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
-        return super().get_queryset().filter(imported_at__range=[last_week,Today],availability="A")
+        return super().get_queryset().filter(created_at__range=[last_week,Today],availability="A")
     
     def most_rated_products(self,**kwargs):
         return super().get_queryset().filter(ratings__isnull=False).order_by('-ratings__average')
@@ -50,18 +50,6 @@ class TheProduct(models.Model):
     '''final_price is virtually generated'''
     '''discount_precentage has another check constraint for limiting it to 100 manually added in database'''
     product = models.CharField(max_length=50, verbose_name="product")
-    period_choices = (
-        ('1',"One_months"),
-        ('3',"Three_months"),
-        ('6',"Six_months"),
-    )
-    users = (
-        ('1','One'),
-        ('2','Two'),
-        ('3','Three'),
-        ('4','Four'),
-        ('5','Five'),
-    )
     status = (
         ('A','Available'),
         ('U','Unavailable'),
@@ -75,9 +63,7 @@ class TheProduct(models.Model):
     final_price = models.DecimalField(max_digits=13, decimal_places=2,null=True,blank=True)
     pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
     description = models.TextField(verbose_name="description")
-    period = models.CharField(max_length=1,choices=period_choices,verbose_name="period",default='1')
-    max_users = models.CharField(max_length=1,choices=users,verbose_name="Users_in_same_time",default='1')
-    imported_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
+    created_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
     quantity = models.PositiveIntegerField(default=5)
     sold_quantity = models.PositiveIntegerField(default=0)
     availability = models.CharField(max_length=1,choices=status,default='I',verbose_name='Status')
