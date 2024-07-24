@@ -29,45 +29,46 @@ class ProductCategory(models.Model):
 
 class TheProductManager(models.Manager):
     def availables(self,**kwargs):
-        return super().get_queryset().filter(availability="A")
+        return super().get_queryset().filter(availability='A')
     
     def unavailables(self,**kwargs):
-        return super().get_queryset().filter(availability="U")
+        return super().get_queryset().filter(availability='U')
 
     def new_arrivals(self,**kwargs):
         Today = datetime.today()
         last_week = Today-timedelta(days=7)
-        return super().get_queryset().filter(created_at__range=[last_week,Today],availability="A")
+        return super().get_queryset().filter(created_at__range=[last_week,Today],availability='A')
     
     def most_rated_products(self,**kwargs):
         return super().get_queryset().filter(ratings__isnull=False).order_by('-ratings__average')
 
     def most_viewed_products(self,**kwargs):
-        return super().get_queryset().filter(availability="A").annotate(
+        return super().get_queryset().filter(availability='A').annotate(
             count=Count('hits')).order_by('-count')
         
 class TheProduct(models.Model):
     '''final_price is virtually generated'''
     '''discount_precentage has another check constraint for limiting it to 100 manually added in database'''
-    product = models.CharField(max_length=50, verbose_name="product")
+    product = models.CharField(max_length=50, verbose_name='product')
     status = (
         ('A','Available'),
         ('U','Unavailable'),
         ('I','Investigate'),
         ('B','Banned')
     )
-    category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name="category")
+    category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name='category')
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
-    price = models.DecimalField(max_digits=13, decimal_places=2,verbose_name="price",default=50)
+    price = models.DecimalField(max_digits=13, decimal_places=2,verbose_name='price',default=50)
     discount_percentage = models.PositiveSmallIntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],default=0)
     final_price = models.DecimalField(max_digits=13, decimal_places=2,null=True,blank=True)
-    pic_sample = models.ImageField(upload_to="images", verbose_name='picture')
-    description = models.TextField(verbose_name="description")
-    created_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name="imported_at")
+    pic_sample = models.ImageField(upload_to='images', verbose_name='picture')
+    description = models.TextField(verbose_name='description')
+    specs = models.JSONField(verbose_name='Specifications')
+    created_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name='imported_at')
     quantity = models.PositiveIntegerField(default=5)
     sold_quantity = models.PositiveIntegerField(default=0)
     availability = models.CharField(max_length=1,choices=status,default='I',verbose_name='Status')
-    hits = models.ManyToManyField(IPAddress,through="ProductHit", blank=True, related_name='hits',verbose_name='view_counts')
+    hits = models.ManyToManyField(IPAddress,through='ProductHit', blank=True, related_name='hits',verbose_name='view_counts')
     tags = TaggableManager()
     ratings = GenericRelation(Rating, related_query_name='products')
     comments = GenericRelation(Comment)

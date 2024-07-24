@@ -1,6 +1,7 @@
 from django.http import Http404,HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404,redirect
+from django import forms
 #Access mixins
 class SuperAndStaffAccessMixin():
     def dispatch(self, request, *args, **kwargs):
@@ -16,3 +17,10 @@ class SellerAccessMixin():
         else:
             #create a custom template later
             raise PermissionDenied("You must be a seller access to this page")
+        
+class SpecsJsonFieldValidationMixin():
+    def clean_specs(self):
+        specs = self.cleaned_specs.get('specs')
+        if not isinstance(specs, dict):
+            raise forms.ValidationError("Invalid JSON: Please enter a valid JSON object.")
+        return specs

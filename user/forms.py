@@ -10,6 +10,7 @@ from .models import (
     ReportedProduct,
     )
 from base.models import TheProduct
+from .mixins import SpecsJsonFieldValidationMixin
 
 class SignUpForm(UserCreationForm):
     #User signup form
@@ -97,23 +98,23 @@ class SellerRequestApproveForm(forms.ModelForm):
         model = User
         fields = ['username','first_name','last_name','email','is_staff','is_seller','date_joined']
 
-class NewProductApproveForm(forms.ModelForm):
+class NewProductApproveForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super(NewProductApproveForm, self).__init__(*args, **kwargs) 
         self.fields['created_by'].disabled = True
 
     class Meta:
         model = TheProduct
-        fields = ['pic_sample','product','created_by','category','price','discount_percentage','description','availability']
+        fields = ['pic_sample','product','created_by','category','price','discount_percentage','description','specs','availability']
 
-class AddProductForm(forms.ModelForm):
+class AddProductForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super(AddProductForm, self).__init__(*args, **kwargs) 
         self.fields['availability'].disabled = True
 
     class Meta:
         model = TheProduct
-        fields = ['product','category','price','discount_percentage','pic_sample','description','availability']
+        fields = ['product','category','price','discount_percentage','pic_sample','description','specs','availability']
 
 
 class ReportProductForm(forms.ModelForm):
@@ -122,10 +123,10 @@ class ReportProductForm(forms.ModelForm):
         fields = '__all__'
         exclude = ['id','reported_product','user','checked']
 
-class ProductUpdateForm(forms.ModelForm):
+class ProductUpdateForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
     class Meta:
         model = TheProduct
-        fields = ['product','category','price','discount_percentage','pic_sample','description','quantity','availability']
+        fields = ['product','category','price','discount_percentage','pic_sample','description','specs','quantity','availability']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)

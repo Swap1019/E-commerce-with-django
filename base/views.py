@@ -1,5 +1,6 @@
 from typing import Any
-from django.db.models.query import QuerySet
+from django.db import IntegrityError,DataError
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404,redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -86,20 +87,36 @@ class AddToCartView(LoginRequiredMixin, View):
     
 class IncreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
+        
+        try:
+            cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
+            cart.quantity += 1
+            cart.save(update_fields=['quantity'])
 
-        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
-        cart.quantity += 1
-        cart.save(update_fields=['quantity'])
+        except IntegrityError:
+            messages.warning(request=request,message='Not allowed more than 5')
+            
+        except ObjectDoesNotExist:
+            messages.error(request=request,message='Does not exist')
 
+        
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 class DecreaseUpdateCartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
 
-        cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
-        cart.quantity -= 1
-        cart.save(update_fields=['quantity'])
+        try:
+            cart = Cart.objects.get(user = self.request.user, id = self.kwargs.get('id'),checkout = False)
+            cart.quantity -= 1
+            cart.save(update_fields=['quantity'])
         
+        except DataError:
+            messages.warning(request=request,message='Out of range, pls delete the product from you cart or add one')
+        
+        except ObjectDoesNotExist:
+            messages.error(request=request,message='Does not exist')
+
+
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 class UserCartDeleteView(LoginRequiredMixin,View):

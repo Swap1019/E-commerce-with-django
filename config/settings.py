@@ -61,7 +61,12 @@ MIDDLEWARE = [
     'base.middleware.SaveIPAddressMiddleware',
 ]
 
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 SILENCED_SYSTEM_CHECKS = ['auth.E003', 'auth.W004']
+
+
 
 #custom authentication backend
 

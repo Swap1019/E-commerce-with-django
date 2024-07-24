@@ -1,8 +1,6 @@
-{% extends "star_ratings/widget.html" %}
 {% load static %}
 {% load ratings %}
 {% load comment_tags %}
-{% block rating_detail %}
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -71,6 +69,13 @@
                                 user_amount:{{ product.max_users }}
                             </h3>
                         <p class="lead">Description: {{product.description}}</p>
+                        <table>
+                            {% for key,value in product.specs.items %}
+                                <tr>
+                                    <td>{{key}} :</td><td>{{value}}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
                         <div class="d-flex">
                             <a class="btn btn-outline-warning py-auto px-auto mt-auto" href="{% url 'base:add_to_cart' product.id %}"><i class="bi-cart-fill me-1">Add To Cart</i></a>
                             <button type="button" class="btn btn-secondary py-auto px-auto mt-auto" data-toggle="modal" data-target="#exampleModalCenter">
@@ -158,4 +163,3 @@
         
     </body>   
 </html>
-{% endblock %}
