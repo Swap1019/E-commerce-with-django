@@ -1,165 +1,188 @@
 {% load static %}
-{% load ratings %}
 {% load comment_tags %}
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Shop Item - Start Bootstrap Template</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
-        
-        <!-- Bootstrap icons-->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-        
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
-        <link rel="stylesheet" href="{% static '/base/css/bootstrap.min.css' %}">
-        
-        <!--Fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{% static '/base/css/fonts/icomoon/style.css' %}">
-        
-    
-        <!-- Style -->
-        <link rel="stylesheet" href="{% static 'base/css/styles.css' %}">
-    </head>
-    <body>  
-        <!--Report Success Messsage-->
-        {% if messages %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                {% for message in messages %}
-                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endif %}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Shop Item - Start Bootstrap Template</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static '/base/css/bootstrap.min.css' %}">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/base/css/fonts/icomoon/style.css' %}">
+    <!-- Style -->
+    <link rel="stylesheet" href="{% static 'base/css/styles.css' %}">
+</head>
+<body>
+    <!-- Report Success Message -->
+    {% if messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
 
-        <!-- Navbar -->
-        {% include 'base/navbar.html' %}
-        <!-- Product section-->
-        <section class="py-5">
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6">
-                        <img class="card-img-top mb-5 mb-md-0" src="{{product.pic_sample.url}}" />  
-                        {% ratings object %}
-                    </div>
-                    <div class="col-md-6">
-                        <h1 class="display-5 fw-bolder">{{product.product}}</h1>
-                        <div class="fs-5 mb-5">
-                            <!--<span class="text-decoration-line-through">$45.00</span>   class for off price -->
-                            <div class="fs-5 mb-5">
-                                <span id="price">{{ product.price }}</span> USD
-                                <br>
-                                <span id="final_price">10% OFF {{ product.final_price }}</span> USD
-                                <br>
-                                <span id="views">Views :{{views}}</span>
+    <!-- Navbar -->
+    {% include 'base/navbar.html' %}
+
+    <!-- Product section -->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-md-6">
+                    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                        <!-- Carousel wrapper -->
+                        <div id="carouselMaterialStyle" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                            <!-- Indicators -->
+                            <div class="carousel-indicators">
+                                {% for image in product.productimages.all %}
+                                    <button type="button" data-bs-target="#carouselMaterialStyle" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Slide {{ forloop.counter }}"></button>
+                                {% endfor %}
                             </div>
-                        </div>
-                            <!--product specs-->
-                            <h3 class="">
-                                time_limit:{{ product.period }}
-                            </h3>
-                            <h3 class="">
-                                user_amount:{{ product.max_users }}
-                            </h3>
-                        <p class="lead">Description: {{product.description}}</p>
-                        <table>
-                            {% for key,value in product.specs.items %}
-                                <tr>
-                                    <td>{{key}} :</td><td>{{value}}</td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                        <div class="d-flex">
-                            <a class="btn btn-outline-warning py-auto px-auto mt-auto" href="{% url 'base:add_to_cart' product.id %}"><i class="bi-cart-fill me-1">Add To Cart</i></a>
-                            <button type="button" class="btn btn-secondary py-auto px-auto mt-auto" data-toggle="modal" data-target="#exampleModalCenter">
-                                Report
+                            <!-- Inner -->
+                            <div class="carousel-inner rounded-5 shadow-4-strong">
+                                {% for image in product.productimages.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ image.images.url }}" class="d-block w-100" alt="Image of {{ product.product }}" height="500" width="500">
+                                    <div class="carousel-caption d-none d-md-block">
+                                        <h5>{{ product.name }}</h5>
+                                        <p>{{ product.description }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <!-- Inner -->
+                        
+                            <!-- Controls -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselMaterialStyle" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselMaterialStyle" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
                             </button>
                         </div>
-                    </div> 
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h1 class="display-5 fw-bolder">{{ product.product }}</h1>
+                    <div class="fs-5 mb-5">
+                        <span id="price">{{ product.price }}</span> USD
+                        <br>
+                        <span id="final_price">10% OFF {{ product.final_price }}</span> USD
+                        <br>
+                        <span id="views">Views: {{ views }}</span>
+                    </div>
+                    <!-- Product specs -->
+                    <h3>Time limit: {{ product.period }}</h3>
+                    <h3>User amount: {{ product.max_users }}</h3>
+                    <p class="lead">Description: {{ product.description }}</p>
+                    <table>
+                        {% for key, value in product.specs.items %}
+                        <tr>
+                            <td>{{ key }}:</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <div class="d-flex">
+                        <a class="btn btn-outline-warning py-auto px-auto mt-auto" href="{% url 'base:add_to_cart' product.id %}"><i class="bi-cart-fill me-1">Add To Cart</i></a>
+                        <button type="button" class="btn btn-secondary py-auto px-auto mt-auto" data-toggle="modal" data-target="#exampleModalCenter">
+                            Report
+                        </button>
+                    </div>
                 </div>
             </div>
-            <!-- Modal -->
-                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content rounded-0">
-                            <div class="modal-body p-4 px-5">
-                                <div class="main-content text-center">
-                                </br>
-                                    <i class="bi bi-exclamation-triangle mt-5"></i>
-                                    <form class="form-group" method="post" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <h4>Report this product</h4>
-                                        <div class="form-group mb-4">
-                                            {{ form.as_p }}
-                                        </div>
-                                        <div class="d-flex">
-                                            <div class="mx-auto">
-                                                <input type="submit" value="Confirm">
-                                            </div>
-                                        </div>
-                                    </form>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-body p-4 px-5">
+                        <div class="main-content text-center">
+                            <i class="bi bi-exclamation-triangle mt-5"></i>
+                            <form class="form-group" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h4>Report this product</h4>
+                                <div class="form-group mb-4">
+                                    {{ form.as_p }}
                                 </div>
-                            </div>
+                                <div class="d-flex">
+                                    <div class="mx-auto">
+                                        <input type="submit" value="Confirm">
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-        </section>
-        <!-- Related items section-->
-        {% if related_products %}
-        <section class="py-5 bg-light">
-            <div class="container px-4 px-lg-5 mt-5">
-                <h2 class="fw-bolder mb-4">Related products</h2>
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" style="transition: 0ms;">
-                    {% for related_product in related_products %}
-                    <div class="col mb-5"> 
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img class="card-img-top" src="{{related_product.pic_sample.url}}" />
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder">{{ related_product.product }}</h5>
-                                    <!-- Product price-->
-                                    {{ related_product.price }}
-                                </div>
-                            </div>
-                            <!-- Product actions-->  
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'base:product' related_product.id %}">View</a></div>
+            </div>
+        </div>
+    </section>
+    <!-- Related items section -->
+    {% if related_products %}
+    <section class="py-5 bg-light">
+        <div class="container px-4 px-lg-5 mt-5">
+            <h2 class="fw-bolder mb-4">Related products</h2>
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" style="transition: 0ms;">
+                {% for related_product in related_products %}
+                <div class="col mb-5">
+                    <div class="card h-100">
+                        <!-- Product image-->
+                        <img src="{{ related_product.pic_sample.url }}" class="card-img-top" alt="Image of {{ product.name }}">
+                        <!-- Product details -->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name -->
+                                <h5 class="fw-bolder">{{ related_product.product }}</h5>
+                                <!-- Product price -->
+                                {{ related_product.price }}
                             </div>
                         </div>
-                    </div>  
-                    {% endfor %}
-                </div> 
+                        <!-- Product actions -->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'base:product' related_product.id %}">View</a></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-        </section>
-        {% endif %}
-        {% render_comments product request %}
-        <!-- Footer-->
-        <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-        </footer>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- ajax call-->
-        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-        <script src="{% static '/base/js/detail_script.js' %}"></script>
-        <!-- django-star-ratings call-->
-        <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
-        <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>        
-        <!--Modal Js-->
-        <script src="{% static '/base/js/jquery-3.3.1.min.js' %}"></script>
-        <script src="{% static '/base/js/popper.min.js' %}"></script>
-        <script src="{% static '/base/js/bootstrap.min.js' %}"></script>
-        <script src="{% static '/base/js/main.js' %}"></script>
-        
-    </body>   
+        </div>
+    </section>
+    {% endif %}
+    {% render_comments product request %}
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p>
+        </div>
+    </footer>
+    <!-- Bootstrap core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <!-- Ajax call -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="{% static '/base/js/detail_script.js' %}"></script>
+    <!-- Django-star-ratings call -->
+    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+    <!-- Modal Js -->
+    <script src="{% static '/base/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static '/base/js/popper.min.js' %}"></script>
+    <script src="{% static '/base/js/bootstrap.min.js' %}"></script>
+</body>
 </html>

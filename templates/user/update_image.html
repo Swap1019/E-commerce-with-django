@@ -1,0 +1,24 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+<head>
+    <!--style-->
+    <link href="{% static '/user/css/update-image.css' %}" rel="stylesheet" />
+</head>
+
+<div class="container">
+    <div class="row">
+        {% for image in images %}
+            <div class="col-md-4 mb-4">
+                <div class="image-container position-relative">
+                    <img src="{{ image.images.url }}" class="image" alt="Image of {{ product.product }}">
+                    <div class="middle">
+                        <a class="btn btn-success" href="#" role="button">Update</a>
+                        <a class="btn btn-danger" href="#" role="button">Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

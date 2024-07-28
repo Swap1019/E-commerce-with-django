@@ -10824,3 +10824,19 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+.carousel-item img {
+  display: block;
+  max-width: 100%;
+  transition: opacity 0.5s ease-in-out;
+  height: auto;
+
+.carousel-item {
+  display: none;  /* Hide all items by default */
+  transition: opacity 0.5s ease-in-out; /* Smooth transition */
+}
+
+.carousel-item.active {
+  display: block; /* Show the active item */
+  opacity: 1; /* Ensure active item is fully opaque */
+}

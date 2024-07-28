@@ -19,7 +19,7 @@ class SellerAccessMixin():
             raise PermissionDenied("You must be a seller access to this page")
         
 class SpecsJsonFieldValidationMixin():
-    def clean_specs(self):
+    def cleaned_specs(self):
         specs = self.cleaned_specs.get('specs')
         if not isinstance(specs, dict):
             raise forms.ValidationError("Invalid JSON: Please enter a valid JSON object.")

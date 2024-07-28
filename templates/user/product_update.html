@@ -18,9 +18,10 @@
                         <li class="list-group-item">{{ form.discount_percentage|as_crispy_field }}</li>
                         <li class="list-group-item">{{ form.pic_sample|as_crispy_field }}</li>
                         <li class="list-group-item">{{ form.description|as_crispy_field }}</li>
+                        <li class="list-group-item">{{ form.specs|as_crispy_field }}</li>
                         <li class="list-group-item">{{ form.quantity|as_crispy_field }}</li>
                         <li class="list-group-item">{{ form.availability|as_crispy_field }}</li>
-                        <button type="submit" class="btn btn-success mt-3">Update Product</button>
+                        <input type="submit" class="btn btn-success mt-3" value="Update">
                         <a href="{% url 'user:shop' %}" class="btn btn-danger mt-3">Cancel</a>
                     </form>
                 </div>

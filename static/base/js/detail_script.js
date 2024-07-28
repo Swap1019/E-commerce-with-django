@@ -6,6 +6,10 @@
 // This file is intentionally blank
 // Use this file to add JavaScript to your project
 // ajax call on your button click
+// Initialization for ES Users
+import { Carousel, initMDB } from "mdb-ui-kit";
+
+initMDB({ Carousel });
 document.addEventListener("DOMContentLoaded", function () {
     // Get the alert element
     var alertContainer = document.getElementById('alert-container');

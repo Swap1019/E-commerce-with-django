@@ -3,13 +3,18 @@ from .models import (
         TheProduct,
         PagePic,
         ProductCategory,
-        Cart
+        Cart,
+        Images,
     )
 # Register your models here.
 
 class TheProductAdmin(admin.ModelAdmin):
-    list_display = ('product','pic_sample_preview','price','discount_percentage','created_at','quantity','availability','created_by','id')
+    list_display = ('product','price','discount_percentage','created_at','quantity','availability','created_by','id')
     search_fields = ('product','tags','id')
+
+class ImagesAdmin(admin.ModelAdmin):
+    list_display = ('images_preview','product','id')
+    search_fields = ('product','id')
 
 class PagePicAdmin(admin.ModelAdmin):
     list_display = (['website_pic'])
@@ -26,6 +31,7 @@ class CartAdmin(admin.ModelAdmin):
     search_fields = ('user','product','id')
 
 admin.site.register(TheProduct,TheProductAdmin)
+admin.site.register(Images,ImagesAdmin)
 admin.site.register(PagePic,PagePicAdmin)
 admin.site.register(ProductCategory,ProductCategoryAdmin)
 admin.site.register(Cart,CartAdmin)

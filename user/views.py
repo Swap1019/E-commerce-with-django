@@ -1,6 +1,7 @@
 from typing import Any
 from django.db.models import Q,Count,Sum
 from django.db.models.functions import TruncMonth
+from django.db.models.query import QuerySet
 from django.shortcuts import HttpResponseRedirect,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -22,10 +23,17 @@ from .forms import (
     AddProductForm,
     NewProductApproveForm,
     ProductUpdateForm,
+    ImageForm,
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
-from base.models import TheProduct,Cart,ProductHit
+from base.models import (
+    TheProduct,
+    Cart,
+    ProductHit,
+    Images,
+    )
+
 from django.urls import reverse_lazy,reverse
 from django.views.generic import (
     CreateView,
@@ -193,7 +201,6 @@ class NewProductsView(SuperAndStaffAccessMixin,ListView):
     
 
 class NewProductsSearchView(SuperAndStaffAccessMixin,ListView):
-    '''modify the query'''
     model = TheProduct
     template_name = 'user/new_products_added.html'
     context_object_name = 'newproducts'
@@ -207,7 +214,6 @@ class NewProductsSearchView(SuperAndStaffAccessMixin,ListView):
         )
 
 class NewProductApproveView(SuperAndStaffAccessMixin,UpdateView):
-    '''Update the template'''
     template_name = 'user/new_product_added_approve.html'
     form_class = NewProductApproveForm
     context_object_name = 'product'
@@ -301,13 +307,29 @@ class ShopSearchView(SellerAccessMixin,BaseShopView):
 class AddProductView(SellerAccessMixin,CreateView):
     form_class = AddProductForm
     template_name = 'user/add_product.html'
-    success_url = reverse_lazy('user:shop')
 
     def form_valid(self, form):
         #automaticly insert the user_id
         form.instance.created_by = get_object_or_404(User,user_id = self.request.user.user_id)
+        self.object = form.save()
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('user:add_image', kwargs={'id': self.object.pk})
+    
+class AddProductImageView(SellerAccessMixin,CreateView):
+    model = Images
+    form_class = ImageForm
+    template_name = 'user/add_image.html'
+
+    def form_valid(self, form):
+        #automaticly insert the product_id
+        form.instance.product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
         form.save()
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('user:add_image', kwargs={'id': self.kwargs.get('id')})
     
 class ProductStatsView(SellerAccessMixin,DetailView):
     model = TheProduct
@@ -336,9 +358,19 @@ class ProductUpdateView(SellerAccessMixin,UpdateView):
     model = TheProduct
     form_class = ProductUpdateForm
     template_name = 'user/product_update.html'
-
+    
     def get_success_url(self):
-        return reverse_lazy('user:shop')
+        return reverse('user:update_image', kwargs={'pk': self.object.pk})
+    
+class ProductImagesListView(SellerAccessMixin,ListView):
+    model = Images
+    context_object_name = 'images'
+    template_name = 'user/update_image.html'
+
+    def get_queryset(self):
+        return Images.objects.filter(product = self.kwargs.get('pk'))
+
+
 
 
 

@@ -59,9 +59,9 @@ class TheProduct(models.Model):
     category = models.ManyToManyField(ProductCategory,verbose_name='Category',related_name='category')
     created_by = models.ForeignKey(User,to_field='user_id',on_delete=models.CASCADE,default=None,blank=False)
     price = models.DecimalField(max_digits=13, decimal_places=2,verbose_name='price',default=50)
+    pic_sample = models.ImageField(upload_to='images/thumbnail',help_text='This picture will be shown to the user in list pages')
     discount_percentage = models.PositiveSmallIntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)],default=0)
     final_price = models.DecimalField(max_digits=13, decimal_places=2,null=True,blank=True)
-    pic_sample = models.ImageField(upload_to='images', verbose_name='picture')
     description = models.TextField(verbose_name='description')
     specs = models.JSONField(verbose_name='Specifications')
     created_at = models.DateTimeField(auto_now_add=True,blank=True,verbose_name='imported_at')
@@ -79,13 +79,13 @@ class TheProduct(models.Model):
     def __str__(self):
         return self.product
     
-    def category_names(self):
-        return ', '.join([a.title for a in self.category.all()])
-    category_names.short_description = 'Admin Names'
-    
     def pic_sample_preview(self):
         return mark_safe(f'<img src = "{self.pic_sample.url}" width = "120" height="120" style="border-radius: 5px"/>')
     pic_sample_preview.short_description = 'thumbnail'
+
+    def category_names(self):
+        return ', '.join([a.title for a in self.category.all()])
+    category_names.short_description = 'Admin Names'
 
     def save(self,*args,**kwargs):
         self.quantity_check()
@@ -97,6 +97,14 @@ class TheProduct(models.Model):
 
 
     objects = TheProductManager()
+
+class Images(models.Model):
+    product = models.ForeignKey(TheProduct,to_field='id',related_name='productimages',on_delete=models.CASCADE)
+    images = models.ImageField(upload_to='images', verbose_name='picture')
+
+    def images_preview(self):
+        return mark_safe(f'<img src = "{self.images.url}" width = "120" height="120" style="border-radius: 5px"/>')
+    images_preview.short_description = 'Image of the product'
 
 
 class Cart(models.Model):

@@ -9,7 +9,7 @@ from .models import (
     UserSellerInfo,
     ReportedProduct,
     )
-from base.models import TheProduct
+from base.models import TheProduct,Images
 from .mixins import SpecsJsonFieldValidationMixin
 
 class SignUpForm(UserCreationForm):
@@ -142,3 +142,9 @@ class ProductUpdateForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
     def clean_availability(self):
         availability = self.cleaned_data.get('availability')
         return availability
+    
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Images
+        fields = '__all__'
+        exclude = ['product']
