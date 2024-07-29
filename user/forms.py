@@ -114,7 +114,7 @@ class AddProductForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
 
     class Meta:
         model = TheProduct
-        fields = ['product','category','price','discount_percentage','pic_sample','description','specs','availability']
+        fields = ['product','category','price','discount_percentage','pic_sample','description','specs','tags','availability']
 
 
 class ReportProductForm(forms.ModelForm):
