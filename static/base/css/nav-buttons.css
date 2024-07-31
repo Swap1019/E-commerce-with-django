@@ -1,0 +1,18 @@
+.nav-button {
+    min-width: 200px; /* Adjust the width as needed */
+    max-height: fit-content;
+    text-align: center;
+    border: 2px solid #ccc; /* Default border */
+    border-color: #eeeeeecf !important;
+    border-radius: 4px; /* Optional: adds a slight curve to the corners */
+    transition: border-color 0.3s ease;
+}
+
+.nav-button:not(.active):hover {
+    border-color: #c2c2c2 !important; /* Border color on hover */
+}
+
+
+.nav-button:focus {
+    border-color: #4e4e4e89 !important;
+}

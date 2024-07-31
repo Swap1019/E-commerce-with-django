@@ -28,3 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         alertContainer.style.display = 'none';
     });
 });
+
+import { Tab, initMDB } from "mdb-ui-kit";
+
+initMDB({ Tab });

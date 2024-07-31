@@ -117,3 +117,8 @@ a {
   .container-fluid {
       padding: 0;
   }
+
+  .nav-button {
+    min-width: 150px; /* Adjust the width as needed */
+    text-align: center;
+  }

@@ -10840,3 +10840,8 @@ textarea.form-control-lg {
   display: block; /* Show the active item */
   opacity: 1; /* Ensure active item is fully opaque */
 }
+
+.nav-button {
+  min-width: 150px; /* Adjust the width as needed */
+  text-align: center;
+}
