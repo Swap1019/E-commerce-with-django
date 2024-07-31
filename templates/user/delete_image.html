@@ -13,14 +13,9 @@
             </div>
         {% endif %}
         <div class="agileits-top">
-            <form class="form-group" method="post" enctype="multipart/form-data">
-                {% csrf_token %} 
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <li class="list-group-item">{{ form.images|as_crispy_field }}</li>
-                    <input class="btn btn-success" type="submit" value="Confirm">
-                  </div>
-                </div>
+            <form method="post">{% csrf_token %}
+                <p>Are you sure you want to delete "{{ object }}"?</p>
+                <input type="submit" value="Confirm">
             </form>
         </div>
       </div>

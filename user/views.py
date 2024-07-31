@@ -35,6 +35,7 @@ from base.models import (
     )
 
 from django.urls import reverse_lazy,reverse
+from django.shortcuts import redirect
 from django.views.generic import (
     CreateView,
     ListView,
@@ -360,17 +361,31 @@ class ProductUpdateView(SellerAccessMixin,UpdateView):
     template_name = 'user/product_update.html'
     
     def get_success_url(self):
-        return reverse('user:update_image', kwargs={'pk': self.object.pk})
+        return reverse('user:list_image', kwargs={'pk': self.object.pk})
     
 class ProductImagesListView(SellerAccessMixin,ListView):
     model = Images
     context_object_name = 'images'
-    template_name = 'user/update_image.html'
+    template_name = 'user/list_image.html'
 
     def get_queryset(self):
         return Images.objects.filter(product = self.kwargs.get('pk'))
+    
+class ProductImagesUpdateView(SellerAccessMixin,UpdateView):
+    fields = ['images']
+    model = Images
+    context_object_name = 'image'
+    template_name = 'user/update_image.html'
 
-
+    def get_success_url(self):
+        return reverse('user:list_image', kwargs={'pk': self.object.product.id})
+    
+class ProductImagesDeleteView(SellerAccessMixin,DeleteView):
+    model = Images
+    template_name = 'user/delete_image.html'
+    
+    def get_success_url(self):
+        return reverse('user:list_image', kwargs={'pk': self.object.product.id})
 
 
 

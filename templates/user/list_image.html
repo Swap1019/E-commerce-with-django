@@ -1,0 +1,30 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+<head>
+    <!--style-->
+    <link href="{% static '/user/css/update-image.css' %}" rel="stylesheet" />
+</head>
+
+<div class="d-flex justify-content-end mr-5">
+    <a href="{% url 'user:add_image' images.first.product.id %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+        <i class="fas fa-plus mr-1"></i>Add Image</a>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for image in images %}
+            <div class="col-md-4 mb-4">
+                <div class="image-container position-relative">
+                    <img src="{{ image.images.url }}" class="image" alt="Image of {{ image.product }}">
+                    <div class="middle">
+                        <a class="btn btn-success" href="{% url 'user:update_image' image.id %}" role="button">Update</a>
+                        
+                        <a class="btn btn-danger" href="{% url 'user:delete_image' image.id %}" role="button">Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
