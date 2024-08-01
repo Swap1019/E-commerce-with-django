@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'star_ratings',
     'comment',
     'taggit',
+    'colorfield',
 ]
 
 MIDDLEWARE = [

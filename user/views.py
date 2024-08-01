@@ -24,6 +24,7 @@ from .forms import (
     NewProductApproveForm,
     ProductUpdateForm,
     ImageForm,
+    ColorForm,
     )
 from .mixins import SuperAndStaffAccessMixin,SellerAccessMixin
 from .models import User,UserSellerInfo,ReportedProduct
@@ -32,6 +33,7 @@ from base.models import (
     Cart,
     ProductHit,
     Images,
+    Colors,
     )
 
 from django.urls import reverse_lazy,reverse
@@ -323,9 +325,17 @@ class AddProductImageView(SellerAccessMixin,CreateView):
     form_class = ImageForm
     template_name = 'user/add_image.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        global product
+        product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
+        context['product'] = product
+
+        return context
+
     def form_valid(self, form):
         #automaticly insert the product_id
-        form.instance.product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
+        form.instance.product = product
         form.save()
         return super().form_valid(form)
     
@@ -386,6 +396,20 @@ class ProductImagesDeleteView(SellerAccessMixin,DeleteView):
     
     def get_success_url(self):
         return reverse('user:list_image', kwargs={'pk': self.object.product.id})
+    
+class ProductColorAddView(SellerAccessMixin,CreateView):
+    model = Colors
+    form_class = ColorForm
+    template_name = 'user/add_color.html'
+
+    def form_valid(self, form):
+        #automaticly insert the product_id
+        form.instance.product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
+        form.save()
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('user:add_color', kwargs={'id': self.kwargs.get('id')})
 
 
 

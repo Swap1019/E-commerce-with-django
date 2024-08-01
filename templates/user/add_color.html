@@ -18,9 +18,9 @@
                 {% csrf_token %} 
                 <div class="card mb-3">
                   <div class="card-body">
-                    <li class="list-group-item">{{ form.images|as_crispy_field }}</li>
+                    <li class="list-group-item">{{ form.color|as_crispy_field }}</li>
                     <input class="btn btn-success" type="submit" value="Confirm">
-                    <a href="{% url 'user:add_color' product.id %}" class="btn btn-primary active" role="button" aria-pressed="true">Add Color</a>
+                    <a href="{% url 'user:shop' %}" class="btn btn-primary active" role="button" aria-pressed="true">Done</a>
                   </div>
                 </div>
             </form>

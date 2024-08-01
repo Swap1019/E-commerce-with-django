@@ -9,7 +9,7 @@ from .models import (
     UserSellerInfo,
     ReportedProduct,
     )
-from base.models import TheProduct,Images
+from base.models import TheProduct,Images,Colors
 from .mixins import SpecsJsonFieldValidationMixin
 
 class SignUpForm(UserCreationForm):
@@ -146,5 +146,11 @@ class ProductUpdateForm(SpecsJsonFieldValidationMixin,forms.ModelForm):
 class ImageForm(forms.ModelForm):
     class Meta:
         model = Images
+        fields = '__all__'
+        exclude = ['product']
+
+class ColorForm(forms.ModelForm):
+    class Meta:
+        model = Colors
         fields = '__all__'
         exclude = ['product']

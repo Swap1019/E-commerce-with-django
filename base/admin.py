@@ -5,6 +5,7 @@ from .models import (
         ProductCategory,
         Cart,
         Images,
+        Colors,
     )
 # Register your models here.
 
@@ -15,6 +16,10 @@ class TheProductAdmin(admin.ModelAdmin):
 class ImagesAdmin(admin.ModelAdmin):
     list_display = ('images_preview','product','id')
     search_fields = ('product','id')
+
+class ColorsAdmin(admin.ModelAdmin):
+    list_display = ('color','product','id')
+    search_fields = ('color','id')
 
 class PagePicAdmin(admin.ModelAdmin):
     list_display = (['website_pic'])
@@ -32,6 +37,7 @@ class CartAdmin(admin.ModelAdmin):
 
 admin.site.register(TheProduct,TheProductAdmin)
 admin.site.register(Images,ImagesAdmin)
+admin.site.register(Colors,ColorsAdmin)
 admin.site.register(PagePic,PagePicAdmin)
 admin.site.register(ProductCategory,ProductCategoryAdmin)
 admin.site.register(Cart,CartAdmin)

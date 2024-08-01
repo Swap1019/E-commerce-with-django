@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
 from django.db.models import Count
 from comment.models import Comment
+from colorfield.fields import ColorField
 from taggit.managers import TaggableManager
 
 class IPAddress(models.Model):
@@ -105,6 +106,10 @@ class Images(models.Model):
     def images_preview(self):
         return mark_safe(f'<img src = "{self.images.url}" width = "120" height="120" style="border-radius: 5px"/>')
     images_preview.short_description = 'Image of the product'
+
+class Colors(models.Model):
+    product = models.ForeignKey(TheProduct,to_field='id',related_name='productcolors',on_delete=models.CASCADE)
+    color = ColorField(verbose_name='color')
 
 
 class Cart(models.Model):
