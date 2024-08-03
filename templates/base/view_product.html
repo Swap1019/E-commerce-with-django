@@ -10,7 +10,7 @@
     <title>Shop Item - Start Bootstrap Template</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="{% static '/base/assets/favicon.ico' %}" />
@@ -21,6 +21,7 @@
     <!-- Core theme CSS (includes Bootstrap) -->
     <link href="{% static '/base/css/detail.css' %}" rel="stylesheet" />
     <link href="{% static '/base/css/nav-buttons.css' %}" rel="stylesheet" />
+    <link href="{% static '/base/css/color-selector.css' %}" rel="stylesheet" />
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
@@ -56,7 +57,7 @@
             </button>
         </div>
         <div class="ms-5" style="margin-top: -30px;">
-            <span class="border border-primary bg-primary border p-2 rounded-pill text-white fw-bolder" id="views" >Views: {{ views }}</span>
+            <span class="border border-primary bg-primary border p-2 rounded-pill text-white fw-bolder" id="views">Views: {{ views }}</span>
         </div>
 
         <div class="container px-4 px-lg-5 my-5">
@@ -90,16 +91,31 @@
                 <div class="col-md-6 border border-danger pb-2" style="width: 25%; border-radius: 10px;">
                     <h1 class="display-5 fw-bolder">{{ product.product }}</h1>
                     <hr>
-                    <div class="fs-5 mb-2">
-                        <div class="bg-danger text-white py-auto px-auto text-center font-weight-bold" id="price" style="border-radius: 5px; font-weight: 600; width: 97%;">{{ product.price }}$</div>
-                        {% if product.discount_percentage %}
-                            <br>
-                            <span id="bg-danger text-white py-auto px-auto text-center font-weight-bold">{{ product.discount_percentage }}% OFF {{ product.final_price }}</span> USD
-                        {% endif %}                        
+                    <div class="container mt-3">
+                        <form method="get" action="{% url 'base:add_to_cart' product.id %}">
+                            <div class="color-picker">
+                                {% for color in colors %}
+                                    <div class="color-swatch" data-color="{{ color.color }}" style="background-color: {{ color.color }};"></div>
+                                {% endfor %}
+                            </div>
+                            <div class="fs-5 mb-2">
+                                <div class="bg-danger text-white py-auto px-auto text-center font-weight-bold" id="price" style="border-radius: 5px; font-weight: 600; width: 97%;">{{ product.price }}$</div>
+                                {% if product.discount_percentage %}
+                                    <br>
+                                    <span class="bg-danger text-white py-auto px-auto text-center font-weight-bold">{{ product.discount_percentage }}% OFF {{ product.final_price }}</span> USD
+                                {% endif %}                        
+                            </div>
+                            <input type="hidden" name="color" id="selectedColor" required>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-warning py-auto px-auto mt-auto me-2" style="width: 100%;">
+                                    <i class="bi-cart-fill me-1">Add To Cart</i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <a class="btn btn-warning py-auto px-auto mt-auto me-2" href="{% url 'base:add_to_cart' product.id %}" style="width: 100%;"><i class="bi-cart-fill me-1">Add To Cart</i></a>
-                    </div>
+                                                   
+                    <hr>
+                    
                 </div>
                 
             </div>
@@ -261,7 +277,9 @@
     <!-- Bootstrap core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static '/base/js/detail_script.js' %}"></script>
     <script src="{% static '/base/js/image_modal.js' %}"></script>
+    <script src="{% static '/base/js/color_selector.js' %}"></script>
 </body>
 </html>

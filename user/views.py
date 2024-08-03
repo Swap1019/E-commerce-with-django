@@ -152,9 +152,12 @@ class PurchasedProductsView(LoginRequiredMixin,ListView):
 #----------Admin and staff member interface----------
 
 class NewSellerRequestsView(SuperAndStaffAccessMixin,ListView):
-    model = UserSellerInfo
     template_name = 'user/new_seller_requests.html'
     context_object_name = 'Seller_informations'
+
+    def get_queryset(self):
+        return UserSellerInfo.objects.filter(investigated = False)
+
 
 class NewSellerRequestsSearchView(SuperAndStaffAccessMixin,ListView):
     model = UserSellerInfo
@@ -165,7 +168,7 @@ class NewSellerRequestsSearchView(SuperAndStaffAccessMixin,ListView):
         query = self.request.GET.get('SearchQuery')
         return UserSellerInfo.objects.filter(
             Q(user_id__icontains=query) |
-            Q(national_code__icontains=query),
+            Q(national_code__icontains=query)
         )
 
 class SellerRequestView(SuperAndStaffAccessMixin,UpdateView):
@@ -192,8 +195,15 @@ class SellerRequestView(SuperAndStaffAccessMixin,UpdateView):
         kwargs = super(SellerRequestView,self).get_form_kwargs()
         kwargs.update({
 			'user': self.request.user
-		})  
+		})
         return kwargs
+    
+    def form_valid(self, form):
+        user_id = self.kwargs.get('user_id')
+        seller_info = UserSellerInfo.objects.get(user_id=user_id)
+        seller_info.investigated = True
+        seller_info.save(update_fields=['investigated'])
+        return super().form_valid(form)
     
 class NewProductsView(SuperAndStaffAccessMixin,ListView):
     template_name = 'user/new_products_added.html'
@@ -328,7 +338,7 @@ class AddProductImageView(SellerAccessMixin,CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         global product
-        product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
+        product = get_object_or_404(TheProduct,id = self.kwargs.get('id'),created_by = self.request.user)
         context['product'] = product
 
         return context
@@ -366,9 +376,11 @@ class ProductStatsView(SellerAccessMixin,DetailView):
         return context
     
 class ProductUpdateView(SellerAccessMixin,UpdateView):
-    model = TheProduct
     form_class = ProductUpdateForm
     template_name = 'user/product_update.html'
+
+    def get_queryset(self):
+        return TheProduct.objects.filter(id = self.kwargs.get('pk'),created_by = self.request.user)
     
     def get_success_url(self):
         return reverse('user:list_image', kwargs={'pk': self.object.pk})
@@ -379,13 +391,15 @@ class ProductImagesListView(SellerAccessMixin,ListView):
     template_name = 'user/list_image.html'
 
     def get_queryset(self):
-        return Images.objects.filter(product = self.kwargs.get('pk'))
+        return Images.objects.filter(product = self.kwargs.get('pk'),product__created_by = self.request.user)
     
 class ProductImagesUpdateView(SellerAccessMixin,UpdateView):
     fields = ['images']
-    model = Images
     context_object_name = 'image'
     template_name = 'user/update_image.html'
+
+    def get_queryset(self):
+        return Images.objects.filter(id = self.kwargs.get('pk'),product__created_by = self.request.user)
 
     def get_success_url(self):
         return reverse('user:list_image', kwargs={'pk': self.object.product.id})
@@ -393,6 +407,9 @@ class ProductImagesUpdateView(SellerAccessMixin,UpdateView):
 class ProductImagesDeleteView(SellerAccessMixin,DeleteView):
     model = Images
     template_name = 'user/delete_image.html'
+
+    def get_queryset(self):
+        return Images.objects.filter(id = self.kwargs.get('pk'),product__created_by = self.request.user)
     
     def get_success_url(self):
         return reverse('user:list_image', kwargs={'pk': self.object.product.id})
@@ -404,15 +421,33 @@ class ProductColorAddView(SellerAccessMixin,CreateView):
 
     def form_valid(self, form):
         #automaticly insert the product_id
-        form.instance.product = get_object_or_404(TheProduct,id = self.kwargs.get('id'))
+        form.instance.product = get_object_or_404(TheProduct,pk = self.kwargs.get('pk'),created_by = self.request.user)
         form.save()
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse('user:add_color', kwargs={'id': self.kwargs.get('id')})
+        return reverse('user:add_color', kwargs={'pk': self.kwargs.get('pk')})
+    
+class ProductColorListView(SellerAccessMixin,ListView):
+    model = Colors
+    context_object_name = 'colors'
+    template_name = 'user/list_color.html'
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['product_id'] = self.kwargs.get('pk')
+        return context
+    
+    def get_queryset(self):
+        return Colors.objects.filter(product = self.kwargs.get('pk'),product__created_by = self.request.user)
+    
+class ProductColorsDeleteView(SellerAccessMixin,View):
+    
+    def get(self, request, *args, **kwargs):
+        color_id = kwargs.get('id')
+        get_object_or_404(Colors,id=color_id,product__created_by = self.request.user).delete()
 
-
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 class ShippingProgressSellerView(SellerAccessMixin,ListView):
     template_name = 'user/shipping_progress_seller.html'

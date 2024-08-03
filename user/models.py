@@ -25,6 +25,7 @@ class UserSellerInfo(models.Model):
     user_description = models.TextField(blank=True,help_text="Any descriptions (optional)")
     user_id = models.UUIDField(default=None,unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    investigated = models.BooleanField(default=False)
 
     def identity_view(self):
         return mark_safe(f'<img src = "{self.identity_certificate.url}" width = "120" height="120" style="border-radius: 5px"/>')

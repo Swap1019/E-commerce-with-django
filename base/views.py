@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.views.generic import ListView,DetailView,View
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import TheProduct,Cart,ProductHit
+from .models import TheProduct,Cart,ProductHit,Colors
 from django.db.models import Q,Count
 from user.models import User
 from user.forms import ReportProductForm
@@ -50,6 +50,7 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
         context = super(ProductView, self).get_context_data(*args, **kwargs)
         categories = product.category.all()  # Assuming a product can belong to multiple categories
         context['related_products'] = TheProduct.objects.filter(category__in=categories,availability='A').exclude(id=product.id)
+        context['colors'] = Colors.objects.filter(product=product)
         context['form'] = ReportProductForm(initial={'post': self.object})
         context['views'] = ProductHit.objects.filter(product=product).annotate(hit_count=Count('product')).order_by('-hit_count').count()
         return context
@@ -78,11 +79,31 @@ class ProductView(PageDataMixin,FormMixin,DetailView):
 """Cart Views"""
 class AddToCartView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        product_id = kwargs.get('id')
+        selected_color = request.GET.get('color')
         
-        cart_product_price = TheProduct.objects.get(id=kwargs.get('id'),availability='A').final_price
-        Cart.objects.get_or_create(user = self.request.user, product_id = kwargs.get('id'),cart_product_price=cart_product_price,checkout = False)
+        if not selected_color:
+            # Handle the case where no color was selected
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-        
+        # Validate product and selected color
+        product = get_object_or_404(TheProduct, id=product_id, availability='A')
+        cart_product_price = product.final_price
+
+        # Ensure the selected color is valid for the product
+        color = Colors.objects.filter(product=product, color=selected_color).first()
+        if not color:
+            # Handle invalid color selection
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+        Cart.objects.get_or_create(
+            user=request.user,
+            product_id=product_id,
+            cart_product_price=cart_product_price,
+            color=selected_color,
+            checkout=False
+        )
+
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     
 class IncreaseUpdateCartView(LoginRequiredMixin,View):

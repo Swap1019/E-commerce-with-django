@@ -1,0 +1,32 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <!--style-->
+    <link href="{% static '/user/css/list-color.css' %}" rel="stylesheet" />
+</head>
+
+<div class="d-flex justify-content-end mr-5 mb-3">
+    <a href="{% url 'user:add_color' product_id %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+        <i class="fas fa-plus mr-1"></i>
+        Add Color
+    </a>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for color in colors %}
+            <div class="col-md-4 mb-4">
+                <div class="image-container position-relative">
+                    <div class="rounded-circle" style="background-color: {{ color.color }};"></div>
+                    <div class="middle">
+                        <a class="btn btn-danger" href="{% url 'user:delete_color' color.id %}" role="button">Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <hr>
+</div>
+{% endblock %}

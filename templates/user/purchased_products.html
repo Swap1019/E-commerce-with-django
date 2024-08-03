@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{% static '/base/css/cart.css' %}" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css" integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
         <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+        <link href="{% static '/base/css/color-selector.css' %}" rel="stylesheet"/>
     </head>
     
     <!-- Begin Page Content -->
@@ -114,6 +115,9 @@
                             <div class="flex-grow-1 align-self-center overflow-hidden">
                                 <div>
                                     <h5 class="text-truncate font-size-18"><a href="#" class="text-dark">{{ cart.product }}</a></h5>
+                                    <p class="mb-0 mt-1">
+                                        Color : <span class="fw-medium color-swatch" data-color="{{ cart.color }}" style="vertical-align: middle; width: 35px; height: 35px; background-color: {{cart.color}};"></span>
+                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -150,6 +150,7 @@ class ImageForm(forms.ModelForm):
         exclude = ['product']
 
 class ColorForm(forms.ModelForm):
+
     class Meta:
         model = Colors
         fields = '__all__'
