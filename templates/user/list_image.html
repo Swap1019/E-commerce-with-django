@@ -7,11 +7,11 @@
 </head>
 
 <div class="d-flex justify-content-end mr-5 mb-3">
-    <a href="{% url 'user:add_image' images.first.product.id %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+    <a href="{% url 'user:add_image' product_id %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
         <i class="fas fa-plus mr-1"></i>
         Add Image
     </a>
-    <a href="{% url 'user:list_color' images.first.product.id %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm ml-3">
+    <a href="{% url 'user:list_color' product_id %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm ml-3">
         <i class="fas fa-search mr-1"></i>
         See available colors
     </a>

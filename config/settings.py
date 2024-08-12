@@ -98,13 +98,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE'  : 'django.db.backends.mysql',
-        'NAME'    : 'Ecommerce',
-        'USER'    : 'root',
-        'PASSWORD': '1234',
-        'HOST'    : 'localhost',
-        'PORT'    : '3306',
+        'NAME'    : config('MYSQL_DATABASE'),
+        'USER'    : config('MYSQL_USER'),
+        'PASSWORD': config('MYSQL_PASSWORD'),
+        'HOST': config('HOST'),
+        'PORT': config('PORT'),
     }
 }
+
+
 
 
 # Password validation

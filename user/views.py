@@ -390,6 +390,11 @@ class ProductImagesListView(SellerAccessMixin,ListView):
     context_object_name = 'images'
     template_name = 'user/list_image.html'
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['product_id'] = self.kwargs.get('pk')
+        return context
+
     def get_queryset(self):
         return Images.objects.filter(product = self.kwargs.get('pk'),product__created_by = self.request.user)
     
